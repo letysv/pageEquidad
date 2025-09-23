@@ -1,0 +1,94 @@
+/* Estilos para el menú dinámico */
+#dynamic-menu {
+  list-style: none;
+  padding-left: 0;
+}
+
+#dynamic-menu li {
+  margin-bottom: 1em;
+}
+
+#dynamic-menu a {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 0.5em;
+  border-radius: 4px;
+}
+
+#dynamic-menu a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#dynamic-menu a.active {
+  background-color: rgba(76, 175, 80, 0.3);
+  font-weight: bold;
+}
+
+#dynamic-menu .icon {
+  margin-right: 0.8em;
+  width: 1.2em;
+  text-align: center;
+}
+
+/* Mensajes de estado */
+.text-muted {
+  color: #6c757d !important;
+  font-style: italic;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.seccion-nombre {
+  font-size: 1em;
+  margin-top: 0.7em;
+  margin-bottom: -0.2em;
+}
+
+.item-seccion{
+    font-size: .9em;
+    margin-left:1em;
+    margin-bottom: -.5em;
+}
+
+/* Estilos para los iconos del menú */
+#menu-modulos img.menu-icon {
+    width: 1.2em;
+    height: 1.2em;
+    margin-right: 0.8em;
+    object-fit: contain;
+    filter: brightness(0) invert(1); /* Para que los iconos sean blancos */
+}
+
+/* Asegúrate que el contenedor del menú tenga el ID correcto */
+#menu-modulos {
+    list-style: none;
+    padding-left: 0;
+}
+
+#menu-modulos li {
+    margin-bottom: 1em;
+}
+
+#menu-modulos a {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 0.5em;
+    border-radius: 4px;
+}
+
+#menu-modulos a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#menu-modulos a.active {
+    background-color: rgba(76, 175, 80, 0.3);
+    font-weight: bold;
+}

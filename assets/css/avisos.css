@@ -1,0 +1,21 @@
+/* Estilos para los avisos */
+.avisos-container {
+	margin-top: 2em;
+}
+.aviso-item {
+	/* margin-bottom: 2em; */
+	/* padding-bottom: 1em; */
+	/* border-bottom: 1px solid #eee; */
+}
+.aviso-item:last-child {
+	border-bottom: none;
+}
+.aviso-titulo {
+	color: #000;
+	/* margin-bottom: 0.1em; */
+	margin: 0.5em 0 0 0;
+}
+.aviso-descripcion {
+	text-align: justify;
+	color: blueviolet;
+}
