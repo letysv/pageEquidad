@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>SECRETARÍA DE FISCALIZACIÓN</title>
+	<title>IGUALDAD Y DERECHOS HUMANOS</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<link rel="stylesheet" href="assets/css/main.css" />
@@ -10,8 +10,8 @@
 	<link rel="stylesheet"
 		href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
 	<link rel="stylesheet" href="assets/css/carrusel.css" />
-	<link rel="stylesheet" href="assets/css/avisos.css" />
-	<link rel="stylesheet" href="assets/css/modulos.css" />
+	<!-- <link rel="stylesheet" href="assets/css/avisos.css" /> -->
+	<!-- <link rel="stylesheet" href="assets/css/modulos.css" /> -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
 		integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 
@@ -23,7 +23,7 @@
 	<section id="header">
 		<header>
 			<span class="image avatar"><img src="images/LOGO_LXVII_SLOGAN.png" alt="" /></span>
-			<h1 id="logo"><a href="#">SECRETARÍA DE FISCALIZACIÓN</a></h1>
+			<h1 id="logo"><a href="#">Centro de Estudios para la Igualdad de Género y Derechos Humanos</a></h1>
 		</header>
 		<nav id="nav">
 			<ul id="menu-modulos">
@@ -107,22 +107,22 @@
 
 
 	<script type="module">
-		// const URL_BASE = 'http://127.0.0.1:8000/';
-		const URL_BASE = 'https://legisver.gob.mx/sitioAdminFiscalizacion/';
+		const URL_BASE = 'http://127.0.0.1:8000/';
+		// const URL_BASE = 'https://legisver.gob.mx/sitioAdminFiscalizacion/';
 
-		const URL_API_MODULOS = URL_BASE + 'api/modulos/';
-		const URL_API_AVISOS = URL_BASE + 'api/avisos';
+		// const URL_API_MODULOS = URL_BASE + 'api/modulos/';
+		// const URL_API_AVISOS = URL_BASE + 'api/avisos';
 		const URL_API_NOTAS = URL_BASE + 'api/notas';
 		const URL_API_NOTA = URL_BASE + 'api/nota';
 
-		const URL_FILES_AVISOS = URL_BASE + 'storage/avisos/';
+		// const URL_FILES_AVISOS = URL_BASE + 'storage/avisos/';
 		const URL_FILES_NOTAS = URL_BASE + 'storage/notas/';
-		const URL_FILES_MODULOS = URL_BASE + 'storage/seccionItems/';
+		// const URL_FILES_MODULOS = URL_BASE + 'storage/seccionItems/';
 		const URL_FILES_ICONOS = URL_BASE + 'storage/iconos/';
 
 
-		import * as modulos from './resources/views/modulos.js';
-		import * as avisos from './resources/views/avisos.js';
+		// import * as modulos from './resources/views/modulos.js';
+		// import * as avisos from './resources/views/avisos.js';
 		import * as carousel from './resources/views/carousell.js';
 
 		$(document).ready(function () {
@@ -138,30 +138,30 @@
 			carousel.crear(carouselSettings);
 
 			// Cargar menú de módulos
-			const modulosSettings = {
-				url_base: URL_BASE,
-				url_api: URL_API_MODULOS,
-				url_apiNotas:URL_API_NOTAS,
-				url_apiNota:URL_API_NOTA,
-				url_filesNotas:URL_FILES_NOTAS,
-				url_files: URL_FILES_MODULOS,
-				url_files_iconos: URL_FILES_ICONOS,
-				menu_container: 'menu-modulos',
-				main_container: 'main_container',
-				datacontainer: 'data_container',
-			}
+			// const modulosSettings = {
+			// 	url_base: URL_BASE,
+			// 	url_api: URL_API_MODULOS,
+			// 	url_apiNotas:URL_API_NOTAS,
+			// 	url_apiNota:URL_API_NOTA,
+			// 	url_filesNotas:URL_FILES_NOTAS,
+			// 	url_files: URL_FILES_MODULOS,
+			// 	url_files_iconos: URL_FILES_ICONOS,
+			// 	menu_container: 'menu-modulos',
+			// 	main_container: 'main_container',
+			// 	datacontainer: 'data_container',
+			// }
 			// console.log(modulosSettings);
-			modulos.modulosAside(modulosSettings);
+			// modulos.modulosAside(modulosSettings);
 
 			// Cargar avisos
-			const contentSettings = {
-				url_api: URL_API_AVISOS,
-				url_files: URL_FILES_AVISOS,
-				main_container: 'main_container',
-				datacontainer: 'data_container',
-				title: 'Avisos Importante'
-			}
-			avisos.muestra(contentSettings);
+			// const contentSettings = {
+			// 	url_api: URL_API_AVISOS,
+			// 	url_files: URL_FILES_AVISOS,
+			// 	main_container: 'main_container',
+			// 	datacontainer: 'data_container',
+			// 	title: 'Avisos Importante'
+			// }
+			// avisos.muestra(contentSettings);
 
 		});
 	</script>
