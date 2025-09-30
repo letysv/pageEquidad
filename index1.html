@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>IGUALDAD Y DERECHOS HUMANOS</title>
+	<title>SECRETARÍA DE FISCALIZACIÓN</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<link rel="stylesheet" href="assets/css/main.css" />
@@ -10,8 +10,8 @@
 	<link rel="stylesheet"
 		href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
 	<link rel="stylesheet" href="assets/css/carrusel.css" />
-	<!-- <link rel="stylesheet" href="assets/css/avisos.css" /> -->
-	<!-- <link rel="stylesheet" href="assets/css/modulos.css" /> -->
+	<link rel="stylesheet" href="assets/css/avisos.css" />
+	<link rel="stylesheet" href="assets/css/modulos.css" />
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
 		integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 
@@ -110,37 +110,19 @@
 		const URL_BASE = 'http://127.0.0.1:8000/';
 		// const URL_BASE = 'https://legisver.gob.mx/sitioAdminFiscalizacion/';
 
-		// const URL_API_ACTIVIDADES = URL_BASE + 'api/actividades';
-		// const URL_API_EQUIPO = URL_BASE + 'api/equipo';
-		// const URL_API_BIBLIOTECA = URL_BASE + 'api/libros';
-		// const URL_API_EFEMERIDES = URL_BASE + 'api/efemerides';
-		// const URL_API_ENLACES = URL_BASE + 'api/enlaces';
-		const URL_API_EQUIPO = URL_BASE + 'api/equipos';
-		// const URL_API_INFORMES = URL_BASE + 'api/informes';
+		const URL_API_MODULOS = URL_BASE + 'api/modulos/';
+		const URL_API_AVISOS = URL_BASE + 'api/avisos';
 		const URL_API_NOTAS = URL_BASE + 'api/notas';
 		const URL_API_NOTA = URL_BASE + 'api/nota';
-		// const URL_API_PUBLICACIONES = URL_BASE + 'api/publicaciones';
-		
-		// const URL_FILES_ACTIVIDADES = URL_BASE + 'storage/actividades/';
-		// const URL_FILES_EQUIPO = URL_BASE + 'storage/equipo/';
-		// const URL_FILES_BIBLIOTECA = URL_BASE + 'storage/biblioteca/';
-		// const URL_FILES_EFEMERIDES = URL_BASE + 'storage/efemerides/';
-		// const URL_FILES_ENLACES = URL_BASE + 'storage/notas/';
-		const URL_FILES_EQUIPO = URL_BASE + 'storage/equipo/';
-		// const URL_FILES_INFORMES = URL_BASE + 'storage/informes/';
+
+		const URL_FILES_AVISOS = URL_BASE + 'storage/avisos/';
 		const URL_FILES_NOTAS = URL_BASE + 'storage/notas/';
-		// const URL_FILES_PUBLICACIONES = URL_BASE + 'storage/publicaciones/';
+		const URL_FILES_MODULOS = URL_BASE + 'storage/seccionItems/';
 		const URL_FILES_ICONOS = URL_BASE + 'storage/iconos/';
 
+
 		import * as modulos from './resources/views/modulos.js';
-		// import * as actividades from './resources/views/actividades.js';
-		// import * as equipo from './resources/views/equipo.js';
-		// import * as biblioteca from './resources/views/biblioteca.js';
-		// import * as efemerides from './resources/views/efemerides.js';
-		// import * as enlaces from './resources/views/enlaces.js';
-		import * as equipo from './resources/views/equipo.js';
-		// import * as informes from './resources/views/informes.js';
-		// import * as publicaciones from './resources/views/publicaciones.js';
+		import * as avisos from './resources/views/avisos.js';
 		import * as carousel from './resources/views/carousell.js';
 
 		$(document).ready(function () {
@@ -168,18 +150,18 @@
 				main_container: 'main_container',
 				datacontainer: 'data_container',
 			}
-			console.log(modulosSettings);
+			// console.log(modulosSettings);
 			modulos.modulosAside(modulosSettings);
 
 			// Cargar avisos
-			// const contentSettings = {
-			// 	url_api: URL_API_AVISOS,
-			// 	url_files: URL_FILES_AVISOS,
-			// 	main_container: 'main_container',
-			// 	datacontainer: 'data_container',
-			// 	title: 'Avisos Importante'
-			// }
-			// avisos.muestra(contentSettings);
+			const contentSettings = {
+				url_api: URL_API_AVISOS,
+				url_files: URL_FILES_AVISOS,
+				main_container: 'main_container',
+				datacontainer: 'data_container',
+				title: 'Avisos Importante'
+			}
+			avisos.muestra(contentSettings);
 
 		});
 	</script>

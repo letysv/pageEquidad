@@ -19,6 +19,26 @@ export function modulosAside(settings) {
             const currentPath = window.location.pathname + window.location.hash;
             let moduloActivoEncontrado = false;
 
+            const $liInicio = $('<li></li>');
+            const $aInicio = $('<a href=""></a>')
+                .append(`<img src="${settings.url_files_iconos}default.png" class="menu-icon" alt="Inicio">`)
+                .append(' Inicio');
+
+            $liInicio.append($aInicio);
+            $menu.append($liInicio);
+
+            const $liNotas = $('<li></li>');
+            const $aNotas = $('<a href=""></a>')
+                .append(`<img src="${settings.url_files_iconos}default.png" class="menu-icon" alt="Notas">`)
+                .append(' Notas');
+            
+            $liNotas.append($aNotas);
+            $aNotas.on("click", function (e) {
+                e.preventDefault();
+                notas.muestra(settings);
+            });
+            $menu.append($liNotas);
+
             // Filtrar y ordenar módulos activos
             const modulosActivos = data
                 .filter(modulo => modulo.activo)
@@ -27,32 +47,32 @@ export function modulosAside(settings) {
 
             // Si no hay módulos activos
             if (modulosActivos.length === 0) {
-                $menu.html('<li class="text-muted">No hay módulos disponibles</li>');
+                // $menu.html('<li class="text-muted">No hay módulos disponibles</li>');
                 return;
             }
 
             // const $liInicio = $('<li></li>');
             // const $aInicio = $('<a href="">Inicio</a>')
-            const $liInicio = $('<li></li>');
-            const $aInicio = $('<a href=""></a>')
-            .append(`<img src="${settings.url_files_iconos}default.png" class="menu-icon" alt="Inicio">`)
-            .append(' Inicio');  // El espacio antes de "Inicio" es importante para separar el icono del texto
+            // const $liInicio = $('<li></li>');
+            // const $aInicio = $('<a href=""></a>')
+            // .append(`<img src="${settings.url_files_iconos}default.png" class="menu-icon" alt="Inicio">`)
+            // .append(' Inicio');  // El espacio antes de "Inicio" es importante para separar el icono del texto
 
-            $liInicio.append($aInicio);
-            $menu.append($liInicio);
+            // $liInicio.append($aInicio);
+            // $menu.append($liInicio);
 
             // const $liNotas = $('<li></li>');
             // const $aNotas = $('<a href="">Notas</a>')
-            const $liNotas = $('<li></li>');
-            const $aNotas = $('<a href=""></a>')
-            .append(`<img src="${settings.url_files_iconos}default.png" class="menu-icon" alt="Notas">`)
-            .append(' Notas');
-            $liNotas.append($aNotas);
-            $aNotas.on("click", function (e) {
-                e.preventDefault(); // Prevenir el comportamiento por defecto del enlace
-                notas.muestra(settings);
-            });
-            $menu.append($liNotas);
+            // const $liNotas = $('<li></li>');
+            // const $aNotas = $('<a href=""></a>')
+            // .append(`<img src="${settings.url_files_iconos}default.png" class="menu-icon" alt="Notas">`)
+            // .append(' Notas');
+            // $liNotas.append($aNotas);
+            // $aNotas.on("click", function (e) {
+            //     e.preventDefault(); // Prevenir el comportamiento por defecto del enlace
+            //     notas.muestra(settings);
+            // });
+            // $menu.append($liNotas);
 
 
             // Crear ítems del menú
