@@ -27,7 +27,15 @@
 		</header>
 		<nav id="nav">
 			<ul id="menu-modulos">
-				<!-- Los módulos se cargarán aquí dinámicamente -->
+				<li><a href="#Inicio" class="active">Inicio</a></li>
+				<li><a href="#Notas">Notas</a></li>
+				<li><a href="#Equipo">Equipo CEIGyDH</a></li>
+				<li><a href="#Publicaciones">Publicaciones</a></li>
+				<li><a href="#Biblioteca">Biblioteca Virtual</a></li>
+				<li><a href="#Efemeridoes">Efemérides</a></li>
+				<li><a href="#Informes">Informes Legislativos</a></li>
+				<li><a href="#Enlaces">Enlaces Recomendados</a></li>
+				<li><a href="#Actividades">Actividades Realizadas</a></li>
 			</ul>
 		</nav>
 		<!-- <footer>
@@ -110,37 +118,13 @@
 		const URL_BASE = 'http://127.0.0.1:8000/';
 		// const URL_BASE = 'https://legisver.gob.mx/sitioAdminFiscalizacion/';
 
-		// const URL_API_ACTIVIDADES = URL_BASE + 'api/actividades';
-		// const URL_API_EQUIPO = URL_BASE + 'api/equipo';
-		// const URL_API_BIBLIOTECA = URL_BASE + 'api/libros';
-		// const URL_API_EFEMERIDES = URL_BASE + 'api/efemerides';
-		// const URL_API_ENLACES = URL_BASE + 'api/enlaces';
-		const URL_API_EQUIPO = URL_BASE + 'api/equipos';
-		// const URL_API_INFORMES = URL_BASE + 'api/informes';
 		const URL_API_NOTAS = URL_BASE + 'api/notas';
 		const URL_API_NOTA = URL_BASE + 'api/nota';
-		// const URL_API_PUBLICACIONES = URL_BASE + 'api/publicaciones';
-		
-		// const URL_FILES_ACTIVIDADES = URL_BASE + 'storage/actividades/';
-		// const URL_FILES_EQUIPO = URL_BASE + 'storage/equipo/';
-		// const URL_FILES_BIBLIOTECA = URL_BASE + 'storage/biblioteca/';
-		// const URL_FILES_EFEMERIDES = URL_BASE + 'storage/efemerides/';
-		// const URL_FILES_ENLACES = URL_BASE + 'storage/notas/';
-		const URL_FILES_EQUIPO = URL_BASE + 'storage/equipo/';
-		// const URL_FILES_INFORMES = URL_BASE + 'storage/informes/';
+
 		const URL_FILES_NOTAS = URL_BASE + 'storage/notas/';
-		// const URL_FILES_PUBLICACIONES = URL_BASE + 'storage/publicaciones/';
 		const URL_FILES_ICONOS = URL_BASE + 'storage/iconos/';
 
-		import * as modulos from './resources/views/modulos.js';
-		// import * as actividades from './resources/views/actividades.js';
-		// import * as equipo from './resources/views/equipo.js';
-		// import * as biblioteca from './resources/views/biblioteca.js';
-		// import * as efemerides from './resources/views/efemerides.js';
-		// import * as enlaces from './resources/views/enlaces.js';
-		import * as equipo from './resources/views/equipo.js';
-		// import * as informes from './resources/views/informes.js';
-		// import * as publicaciones from './resources/views/publicaciones.js';
+		// import * as modulos from './resources/views/modulos.js';
 		import * as carousel from './resources/views/carousell.js';
 
 		$(document).ready(function () {
@@ -158,18 +142,18 @@
 			// Cargar menú de módulos
 			const modulosSettings = {
 				url_base: URL_BASE,
-				url_api: URL_API_MODULOS,
+				// url_api: URL_API_MODULOS,
 				url_apiNotas:URL_API_NOTAS,
 				url_apiNota:URL_API_NOTA,
 				url_filesNotas:URL_FILES_NOTAS,
-				url_files: URL_FILES_MODULOS,
+				// url_files: URL_FILES_MODULOS,
 				url_files_iconos: URL_FILES_ICONOS,
 				menu_container: 'menu-modulos',
 				main_container: 'main_container',
 				datacontainer: 'data_container',
 			}
 			console.log(modulosSettings);
-			modulos.modulosAside(modulosSettings);
+			// modulos.modulosAside(modulosSettings);
 
 			// Cargar avisos
 			// const contentSettings = {
