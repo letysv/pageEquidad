@@ -118,15 +118,21 @@
 		const URL_BASE = 'http://127.0.0.1:8000/';
 		// const URL_BASE = 'https://legisver.gob.mx/sitioAdminFiscalizacion/';
 
+		const URL_API_EQUIPOS = URL_BASE + 'api/equipos';
+		const URL_API_EQUIPO = URL_BASE + 'api/equipo';
+
 		const URL_API_NOTAS = URL_BASE + 'api/notas';
 		const URL_API_NOTA = URL_BASE + 'api/nota';
+
+		const URL_FILES_EQUIPO = URL_BASE + 'storage/equipo/';
 
 		const URL_FILES_NOTAS = URL_BASE + 'storage/notas/';
 		const URL_FILES_ICONOS = URL_BASE + 'storage/iconos/';
 
 		// import * as modulos from './resources/views/modulos.js';
 		import * as carousel from './resources/views/carousell.js';
-		import * as notas from './resources/views/notas.js';
+		import * as equipo from './resources/views/equipo.js';
+		// import * as notas from './resources/views/notas.js';
 
 		$(document).ready(function () {
 
@@ -139,6 +145,19 @@
 				container: 'banner-carousel'
 			}
 			carousel.crear(carouselSettings);
+
+			// cargar módulo Equipo
+			console.log("Vamos")
+			const equipoSettings = {
+				url_api: URL_API_EQUIPOS,
+				url_filesEquipo:URL_FILES_EQUIPO,
+				url_apiEquipos:URL_API_EQUIPOS,
+				url_apiEquipo:URL_API_EQUIPO,
+				main_container: 'main_container',
+				datacontainer: 'data_container',
+				title: 'Equipo CEIGyDH'
+			}
+			equipo.muestra(equipoSettings);
 
 			// Cargar menú de módulos
 			// const modulosSettings = {
@@ -154,14 +173,14 @@
 			// 	datacontainer: 'data_container',
 			// }
 
-			const notasSettings = {
-  				url_apiNotas: URL_API_NOTAS,
-  				url_apiNota: URL_API_NOTA,
-  				url_filesNotas: URL_FILES_NOTAS,
-  				main_container: 'main_container',
-			};
+			// const notasSettings = {
+  			// 	url_apiNotas: URL_API_NOTAS,
+  			// 	url_apiNota: URL_API_NOTA,
+  			// 	url_filesNotas: URL_FILES_NOTAS,
+  			// 	main_container: 'main_container',
+			// };
 
-			notas.muestra(notasSettings);
+			// notas.muestra(notasSettings);
 			// console.log(modulosSettings);
 			// modulos.modulosAside(modulosSettings);
 
