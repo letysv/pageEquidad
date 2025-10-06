@@ -1,140 +1,109 @@
-/**
- * 
- * @param {Array} settings - Configuración para las notas
- */
+// Carga la información del equipo desde la API y la muestra en el contenedor
+// principal definido en la configuración.
+// @param {Object} settings - Configuración del módulo de equipo.
+
+
 export function muestra(settings) {
-console.log(settings)
     $.ajax({
-        url: settings.url_api,
+        url: settings.url_apiEquipos || settings.url_api,
         method: "GET",
         dataType: "json",
         success: function (data) {
-            index(data, settings);
+            renderEquipo(data, settings);
+        },
+        error: function () {
+            renderEquipo([], settings, {
+                mensaje: 'No fue posible cargar la información del equipo en este momento.'
+            });
         }
-    })
+    });
 }
 
-/** 
- * Muestra las notas en el contenedor especificado.
- * @param {Array} data - Array de notas obtenidas de la API.
- * @param {string} contenedor - ID del contenedor donde se mostrarán las notas
- * @param {string} rutaBase - Ruta base para las imágenes de las notas
-*/
-function index(data, settings) {
-    const NotasActivas = data.filter((nota) => nota.activo);
+/**
+ * Construye las tarjetas del equipo dentro del contenedor indicado.
+ * @param {Array} data - Lista de personas que integran el equipo.
+ * @param {Object} settings - Configuración del módulo.
+ * @param {Object} [estado] - Estado adicional para mostrar mensajes personalizados.
+ */
+
+function renderEquipo(data, settings, estado = {}) {
+    const integrantes = Array.isArray(data) ? data : [];
+    const integrantesActivos = integrantes.filter((integrante) => integrante.activo !== false);
     const $mainContainer = $("#" + settings.main_container);
-    $mainContainer.html("");
+    $mainContainer.empty();
+
+    const titulo = settings.title || 'Equipo';
 
     // Actualizar el título si se proporciona
-    if (NotasActivas.length === 0) {
-        const $item = $(`
+     if (integrantesActivos.length === 0) {
+        const mensaje = estado.mensaje || 'No hay integrantes del equipo disponibles en este momento.';
+        const $contenidoVacio = $(`
             <header class="major">
                 <h2 class="modulo-nombre">No hay notas disponibles en este momento.</h2>
                 <div class="modulo-secciones"></div>
+                <h2 class="modulo-nombre">${titulo}</h2>
             </header>
+            <div class="alert alert-info" role="alert">
+                ${mensaje}
+            </div>
         `);
-        $mainContainer.append($item);
+        $mainContainer.append($contenidoVacio);
         return;
     }
 
-    // Se crea el encabezado para las notas
-    const $item = $(`
+    const $encabezado = $(`
         <header class="major">
-            <h2 class="modulo-nombre">Notas</h2>
-            <div class="modulo-secciones row"></div>
+            <h2 class="modulo-nombre">${titulo}</h2>
+            <div class="modulo-secciones row g-4"></div>
         </header>
     `);
-    $mainContainer.append($item);
+    
+    const $cardsContainer = $encabezado.find('.modulo-secciones');
+    integrantesActivos.forEach((integrante) => {
+        const nombre = integrante.nombre || integrante.titulo || 'Integrante del equipo';
+        const cargo = integrante.cargo || integrante.puesto || '';
+        const descripcion = integrante.descripcion || integrante.resenia || '';
+        const foto = obtenerFoto(integrante, settings);
 
-    // Se crea el contenedor para las tarjetas de notas
-    const $cardsContainer = $item.find(".modulo-secciones");
-
-    // console.log(settings)
-
-    // Se crean las tarjetas para cada nota activa
-    NotasActivas.forEach(nota => {
-        // Se trunca la descripción si es muy larga
-        const descripcionTruncada = nota.descripcion.length > 100
-            ? nota.descripcion.substring(0, 100) + '...'
-            : nota.descripcion;
-
-        const imagenes = nota.items || [];
-
-        // Se establecen valores para la imagen
-        const imgElement = $('<img class="mt-2">').attr({
-            'src': settings.url_filesNotas + imagenes[0].archivo,
-            'alt': nota.nombre || 'Imagen de la nota'
-        });
-
-        // Se crea el elemento de la tarjeta
-        const $item = $(`
-            <div class="card" style="width: 18rem; margin-right: 10px; margin-bottom: 10px; cursor: pointer;">
-                <img src="..." class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h6 class="card-title">${nota.nombre}</h6>
-                    <p class="card-text">${descripcionTruncada}</p>
-
-                    </div>
-                    </div>
-                    `);
-                    // <a href="" class="btn btn-primary" onClick="show('${JSON.stringify(settings)}', ${nota.id})">Ver nota</a>
-        $item.on("click", function (e) {
-            e.preventDefault(); // Prevenir el comportamiento por defecto del enlace
-            show(settings, nota.id);
-        });
-
-        // Se reemplaza la imagen de la tarjeta con la imagen de la nota
-        $item.find('.card-img-top').replaceWith(imgElement);
-
-        // Se agrega el elemento de la tarjeta al contenedor
-        $cardsContainer.append($item);
-    });
-}
-
-/** 
- * Muestra los detalles de una nota específica.
- * @param {Array} settings - URL de la API para obtener los detalles de la nota.
- * @param {string} idNota - ID de la nota a mostrar.
- */
-export function show(settings, idNota) {
-    $.ajax({
-        url: `${settings.url_apiNota}/${idNota}`,
-        method: 'GET',
-        dataType: 'json',
-        success: function (notaJson) {
-            // notaJson = JSON.parse(notaJson); 
-            const mainContainer = $('#main_container');
-
-            const baseUrl = (settings.url_filesNotas || '').endsWith('/') ? settings.url_filesNotas : settings.url_filesNotas ? settings.url_filesNotas + '/' : '';
-
-
-            // Crear HTML para todas las imágenes en fila
-            let imagenesHTML = '';
-            if (notaJson.items && notaJson.items.length > 0) {
-                imagenesHTML = `
-                    <div class="galeria-horizontal">
-                        ${notaJson.items.map(item => `
-                            <div class="imagen-horizontal-container">
-                                <img src="${baseUrl}${item.archivo}" alt="${notaJson.nombre || 'Imagen de nota'}" class="imagen-horizontal">
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-
-            const detalleHTML = `
-                <div class="nota-detalle">
-                    <h2>${notaJson.nombre || 'Sin título'}</h2>
-                    ${imagenesHTML}
-                    <div class="nota-descripcion">
-                        ${notaJson.descripcion || 'No hay descripción disponible.'}
+        const $card = $(`
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="card h-100 text-center">
+                    ${foto ? `<img src="${foto}" class="card-img-top object-fit-cover" alt="${nombre}">` : ''}
+                    <div class="card-body">
+                        <h5 class="card-title">${nombre}</h5>
+                        ${cargo ? `<p class="text-muted mb-2">${cargo}</p>` : ''}
+                        ${descripcion ? `<p class="card-text">${descripcion}</p>` : ''}
                     </div>
                 </div>
-            `;
+            </div>
+        `);
 
-            // Insertar en el contenedor principal
-            mainContainer.html(detalleHTML);
-        }
+        $cardsContainer.append($card);
     });
+     $mainContainer.append($encabezado);
+}
 
+/**
+ * Obtiene la ruta absoluta de la fotografía asociada al integrante.
+ * @param {Object} integrante - Información del integrante.
+ * @param {Object} settings - Configuración del módulo.
+ * @returns {string|null} Ruta de la imagen o null si no existe.
+ */
+function obtenerFoto(integrante, settings) {
+    const posiblesCampos = [
+        integrante.foto,
+        integrante.fotografia,
+        integrante.imagen,
+        integrante.archivo,
+        integrante.url_foto,
+        integrante?.items?.[0]?.archivo
+    ].filter(Boolean);
+
+    if (posiblesCampos.length === 0) {
+        return null;
+    }
+
+    const base = settings.url_filesEquipo || settings.url_files || '';
+    const baseConSlash = base && !base.endsWith('/') ? `${base}/` : base;
+    return `${baseConSlash}${posiblesCampos[0]}`;
 }

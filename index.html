@@ -136,65 +136,81 @@
 
 		$(document).ready(function () {
 
-			// cargar carrusel de imágenes
-			const carouselSettings = {
-				url_api: URL_API_NOTAS,
-				url_filesNotas:URL_FILES_NOTAS,
-				url_apiNotas:URL_API_NOTAS,
-				url_apiNota:URL_API_NOTA,
-				container: 'banner-carousel'
-			}
-			carousel.crear(carouselSettings);
+        	const defaultContent = `
+            	<header class="major">
+                	<h2>Centro de Estudios para la Igualdad de Género y Derechos Humanos</h2>
+                </header>
+                <div id="data_container" class="default-content">
+                    <p>
+                	    Trabajamos para impulsar una agenda legislativa con perspectiva de género,
+                        promover los derechos humanos e impulsar acciones afirmativas que reduzcan
+                        las brechas de desigualdad.
+                    </p>
+                    <ul>
+                        <li>Acompañamos iniciativas y proyectos para la igualdad sustantiva.</li>
+                        <li>Generamos investigaciones y materiales de consulta especializados.</li>
+                        <li>Ofrecemos capacitación permanente con enfoque de derechos humanos.</li>
+                    </ul>
+                </div>
+            `;
 
-			// cargar módulo Equipo
-			console.log("Vamos")
-			const equipoSettings = {
-				url_api: URL_API_EQUIPOS,
-				url_filesEquipo:URL_FILES_EQUIPO,
-				url_apiEquipos:URL_API_EQUIPOS,
-				url_apiEquipo:URL_API_EQUIPO,
-				main_container: 'main_container',
-				datacontainer: 'data_container',
-				title: 'Equipo CEIGyDH'
-			}
-			equipo.muestra(equipoSettings);
+            function mostrarContenidoInicial() {
+            	$('#main_container').html(defaultContent);
+            }
 
-			// Cargar menú de módulos
-			// const modulosSettings = {
-			// 	url_base: URL_BASE,
-			// 	// url_api: URL_API_MODULOS,
-			// 	url_apiNotas:URL_API_NOTAS,
-			// 	url_apiNota:URL_API_NOTA,
-			// 	url_filesNotas:URL_FILES_NOTAS,
-			// 	// url_files: URL_FILES_MODULOS,
-			// 	url_files_iconos: URL_FILES_ICONOS,
-			// 	menu_container: 'menu-modulos',
-			// 	main_container: 'main_container',
-			// 	datacontainer: 'data_container',
-			// }
+            function activarEnlace($enlace) {
+                $('#menu-modulos a').removeClass('active');
+                $enlace.addClass('active');
+            }
 
-			// const notasSettings = {
-  			// 	url_apiNotas: URL_API_NOTAS,
-  			// 	url_apiNota: URL_API_NOTA,
-  			// 	url_filesNotas: URL_FILES_NOTAS,
-  			// 	main_container: 'main_container',
-			// };
+            const equipoSettings = {
+                url_apiEquipos: URL_API_EQUIPOS,
+                url_filesEquipo: URL_FILES_EQUIPO,
+                url_apiEquipo: URL_API_EQUIPO,
+                main_container: 'main_container',
+                datacontainer: 'data_container',
+                title: 'Equipo CEIGyDH'
+            };
 
-			// notas.muestra(notasSettings);
-			// console.log(modulosSettings);
-			// modulos.modulosAside(modulosSettings);
+			mostrarContenidoInicial();
+            activarEnlace($('#menu-modulos a[href="#Inicio"]'));
 
-			// Cargar avisos
-			// const contentSettings = {
-			// 	url_api: URL_API_AVISOS,
-			// 	url_files: URL_FILES_AVISOS,
-			// 	main_container: 'main_container',
-			// 	datacontainer: 'data_container',
-			// 	title: 'Avisos Importante'
-			// }
-			// avisos.muestra(contentSettings);
+            // cargar carrusel de imágenes
+            const carouselSettings = {
+                url_api: URL_API_NOTAS,
+                url_filesNotas: URL_FILES_NOTAS,
+                url_apiNotas: URL_API_NOTAS,
+                url_apiNota: URL_API_NOTA,
+                container: 'banner-carousel'
+            };
+            carousel.crear(carouselSettings);
 
-		});
+            $('#menu-modulos a').on('click', function (event) {
+                const destino = $(this).attr('href');
+
+                if (destino === '#Inicio') {
+                    event.preventDefault();
+                    activarEnlace($(this));
+                    mostrarContenidoInicial();
+            	} else if (destino === '#Equipo') {
+                    event.preventDefault();
+                    activarEnlace($(this));
+                    equipo.muestra(equipoSettings);
+                } else {
+                    event.preventDefault();
+                    activarEnlace($(this));
+                    const titulo = $(this).text();
+                    $('#main_container').html(`
+                        <header class="major">
+                            <h2>${titulo}</h2>
+                        </header>
+                    	<div class="alert alert-secondary" role="alert">
+                        	El contenido de <strong>${titulo}</strong> estará disponible próximamente.
+                        </div>
+                    `);
+                }
+            });
+	});
 	</script>
 </body>
 
