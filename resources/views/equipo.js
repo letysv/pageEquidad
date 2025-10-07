@@ -59,27 +59,54 @@ function renderEquipo(data, settings, estado = {}) {
     `);
     
     const $cardsContainer = $encabezado.find('.modulo-secciones');
-    integrantesActivos.forEach((integrante) => {
-        const nombre = integrante.nombre || integrante.titulo || 'Integrante del equipo';
-        const cargo = integrante.cargo || integrante.puesto || '';
-        const descripcion = integrante.descripcion || integrante.resenia || '';
-        const foto = obtenerFoto(integrante, settings);
+    for (let i = 0; i < integrantesActivos.length; i += 3) {
+        const grupo = integrantesActivos.slice(i, i + 3);
+
+        const miembrosMarkup = grupo
+            .map((integrante) => {
+                const nombre = integrante.nombre || integrante.titulo || 'Integrante del equipo';
+                const cargo = integrante.cargo || integrante.puesto || '';
+                const descripcion = integrante.descripcion || integrante.resenia || '';
+                const foto = obtenerFoto(integrante, settings);
+                const iniciales = !foto ? obtenerIniciales(nombre) : '';
+
+                return `
+                    <div class="team-member text-center">
+                        ${foto ? `
+                            <div class="team-avatar mx-auto">
+                                <img src="${foto}" class="team-avatar-image" alt="${nombre}">
+                            </div>
+                        ` : `
+                            <div class="team-avatar team-avatar-placeholder mx-auto">${iniciales}</div>
+                        `}
+                        <div class="team-member-info">
+                            <h5 class="team-member-name">${nombre}</h5>
+                            ${cargo ? `<p class="team-member-role text-muted mb-1">${cargo}</p>` : ''}
+                            ${descripcion ? `<p class="team-member-description">${descripcion}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            })
+            .join('');
 
         const $card = $(`
-            <div class="col-12 col-sm-6 col-lg-4">
-                <div class="card h-100 text-center">
-                    ${foto ? `<img src="${foto}" class="card-img-top object-fit-cover" alt="${nombre}">` : ''}
+            <div class="col-12">
+                <div class="card team-group-card border-0">
                     <div class="card-body">
-                        <h5 class="card-title">${nombre}</h5>
-                        ${cargo ? `<p class="text-muted mb-2">${cargo}</p>` : ''}
-                        ${descripcion ? `<p class="card-text">${descripcion}</p>` : ''}
+                        <div class="team-group-row justify-content-center">
+                            ${miembrosMarkup}
+                        </div>
+                    </div>
+                </div>
+            </div>
+                            </div>
                     </div>
                 </div>
             </div>
         `);
 
         $cardsContainer.append($card);
-    });
+    }
      $mainContainer.append($encabezado);
 }
 
@@ -106,4 +133,18 @@ function obtenerFoto(integrante, settings) {
     const base = settings.url_filesEquipo || settings.url_files || '';
     const baseConSlash = base && !base.endsWith('/') ? `${base}/` : base;
     return `${baseConSlash}${posiblesCampos[0]}`;
+}
+
+function obtenerIniciales(nombre) {
+    if (!nombre) {
+        return '';
+    }
+
+    return nombre
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((parte) => parte[0].toUpperCase())
+        .join('');
 }
