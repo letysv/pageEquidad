@@ -120,10 +120,12 @@
 		// const URL_BASE = 'https://legisver.gob.mx/sitioAdminFiscalizacion/';
 
 		const URL_API_EQUIPOS = URL_BASE + 'api/equipos';
-		const URL_API_EQUIPO = URL_BASE + 'api/equipo';
+		// const URL_API_EQUIPO = URL_BASE + 'api/equipo';
 
 		const URL_API_NOTAS = URL_BASE + 'api/notas';
 		const URL_API_NOTA = URL_BASE + 'api/nota';
+
+		const URL_API_PUBLICACIONES = URL_BASE + 'api/publicaciones';
 
 		const URL_FILES_EQUIPO = URL_BASE + 'storage/equipo/';
 
@@ -133,7 +135,8 @@
 		// import * as modulos from './resources/views/modulos.js';
 		import * as carousel from './resources/views/carousell.js';
 		import * as equipo from './resources/views/equipo.js';
-		// import * as notas from './resources/views/notas.js';
+		import * as notas from './resources/views/notas.js';
+		import * as publicaciones from './resources/views/publicaciones.js';
 
 		$(document).ready(function () {
 
@@ -187,11 +190,28 @@
             const equipoSettings = {
                 url_apiEquipos: URL_API_EQUIPOS,
                 url_filesEquipo: URL_FILES_EQUIPO,
-                url_apiEquipo: URL_API_EQUIPO,
+                // url_apiEquipo: URL_API_EQUIPO,
                 main_container: 'main_container',
                 datacontainer: 'data_container',
                 title: 'Equipo CEIGyDH'
             };
+
+			const notasSettings = {
+				url_apiNotas: URL_API_NOTAS,
+				url_filesNotas:URL_FILES_NOTAS,
+				url_apiNota:URL_API_NOTA,
+				main_container: 'main_container',
+                datacontainer: 'data_container',
+                title: 'Notas'
+			}
+
+			const publicacionesSettings = {
+				url_apiPublicaciones: URL_API_PUBLICACIONES,
+				url_filesPublicaciones:URL_FILES_PUBLICACIONES,
+				main_container: 'main_container',
+                datacontainer: 'data_container',
+                title: 'Publicaciones y Material de apoyo'
+			}
 
 			mostrarContenidoInicial();
             activarEnlace($('#menu-modulos a[href="#Inicio"]'));
@@ -217,6 +237,14 @@
                     event.preventDefault();
                     activarEnlace($(this));
                     equipo.muestra(equipoSettings);
+                } else if (destino === '#Notas') {
+                    event.preventDefault();
+                    activarEnlace($(this));
+                    notas.muestra(notasSettings);
+				} else if (destino === '#Publicaciones') {
+                    event.preventDefault();
+                    activarEnlace($(this));
+                    publicaciones.muestra(publicacionesSettings);
                 } else {
                     event.preventDefault();
                     activarEnlace($(this));

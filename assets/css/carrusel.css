@@ -1,17 +1,16 @@
 .owl-carousel .item {
         height: 100%;
-        /* display: flex; */
-        /* align-items: center; */
-        /* justify-content: center; */
-        /* background: #000; */
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        background: #000;
 }
 
 .owl-carousel .item img {
         width: 100%;
-        max-width: 100%;
-        max-height: 100%;
-        height: auto;
-        object-fit: contain;
+        height: 150%;
+        object-fit: cover;
+        flex: 1 1 auto;
         display: block;
 }
 .owl-nav {
@@ -49,7 +48,6 @@
 .owl-dot.active span {
     background: #6c143a !important;
 }
-
 
 .owl-carousel, .owl-carousel .owl-stage-outer, .owl-carousel .owl-stage,
   .owl-carousel .owl-item {
