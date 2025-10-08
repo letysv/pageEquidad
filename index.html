@@ -120,25 +120,28 @@
 		// const URL_BASE = 'https://legisver.gob.mx/sitioAdminFiscalizacion/';
 
 		const URL_API_EQUIPOS = URL_BASE + 'api/equipos';
-		// const URL_API_EQUIPO = URL_BASE + 'api/equipo';
 
 		const URL_API_NOTAS = URL_BASE + 'api/notas';
 		const URL_API_NOTA = URL_BASE + 'api/nota';
 
 		const URL_API_PUBLICACIONES = URL_BASE + 'api/publicaciones';
 
-		const URL_FILES_EQUIPO = URL_BASE + 'storage/equipo/';
+		const URL_API_BIBLIOTECA = URL_BASE + 'api/biblioteca';
 
-		const URL_FILES_PUBLICACIONES = URL_BASE + 'storage/publicaciones/';
+		const URL_FILES_EQUIPO = URL_BASE + 'storage/equipo/';
 
 		const URL_FILES_NOTAS = URL_BASE + 'storage/notas/';
 		const URL_FILES_ICONOS = URL_BASE + 'storage/iconos/';
 
-		// import * as modulos from './resources/views/modulos.js';
+		const URL_FILES_PUBLICACIONES = URL_BASE + 'storage/publicaciones/';
+
+		const URL_FILES_BIBLIOTECA = URL_BASE + 'storage/biblioteca/';
+
 		import * as carousel from './resources/views/carousell.js';
 		import * as equipo from './resources/views/equipo.js';
 		import * as notas from './resources/views/notas.js';
 		import * as publicaciones from './resources/views/publicaciones.js';
+		import * as biblioteca from './resources/views/biblioteca.js';
 
 		$(document).ready(function () {
 
@@ -192,7 +195,6 @@
             const equipoSettings = {
                 url_apiEquipos: URL_API_EQUIPOS,
                 url_filesEquipo: URL_FILES_EQUIPO,
-                // url_apiEquipo: URL_API_EQUIPO,
                 main_container: 'main_container',
                 datacontainer: 'data_container',
                 title: 'Equipo CEIGyDH'
@@ -213,6 +215,14 @@
 				main_container: 'main_container',
                 datacontainer: 'data_container',
                 title: 'Publicaciones y Material de apoyo'
+			}
+
+			const bibliotecaSettings = {
+				url_apiBiblioteca: URL_API_BIBLIOTECA,
+				url_filesBiblioteca:URL_FILES_BIBLIOTECA,
+				main_container: 'main_container',
+                datacontainer: 'data_container',
+                title: 'Biblioteca Virtual'
 			}
 
 			mostrarContenidoInicial();
@@ -247,6 +257,10 @@
                     event.preventDefault();
                     activarEnlace($(this));
                     publicaciones.muestra(publicacionesSettings);
+				} else if (destino === '#Biblioteca') {
+                    event.preventDefault();
+                    activarEnlace($(this));
+                    biblioteca.muestra(bibliotecaSettings);
                 } else {
                     event.preventDefault();
                     activarEnlace($(this));
