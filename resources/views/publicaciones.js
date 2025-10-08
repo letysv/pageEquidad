@@ -32,8 +32,9 @@ function renderPublicaciones(data, settings, estado = {}) {
     $mainContainer.empty();
 
     const titulo = settings.title || 'Publicaciones';
+    const grupos = agruparPorApartado(publicacionesActivas);
 
-    if (publicacionesActivas.length === 0) {
+    if (!grupos.length) {
         const mensaje = estado.mensaje || 'No hay publicaciones disponibles en este momento.';
         const $contenidoVacio = $(`
             <header class="major">
@@ -47,8 +48,6 @@ function renderPublicaciones(data, settings, estado = {}) {
         $mainContainer.append($contenidoVacio);
         return;
     }
-
-    const grupos = agruparPorApartado(publicacionesActivas);
 
     const $encabezado = $(`
         <header class="major">
@@ -66,9 +65,8 @@ function renderPublicaciones(data, settings, estado = {}) {
     const $tabList = $tabsWrapper.find('#publicaciones-tab');
     const $tabContent = $tabsWrapper.find('#publicaciones-tabContent');
 
-    const apartados = Object.keys(grupos);
-
-    apartados.forEach((apartado, index) => {
+    grupos.forEach((grupo, index) => {
+        const apartado = grupo.nombre;
         const tabId = generarIdApartado(apartado, index);
         const esActivo = index === 0;
         const $tab = $(`
@@ -81,18 +79,20 @@ function renderPublicaciones(data, settings, estado = {}) {
             </li>
         `);
 
-        const publicacionesDelApartado = grupos[apartado];
+        const publicacionesDelApartado = grupo.publicaciones;
         const $pane = $(`
             <div class="tab-pane fade${esActivo ? ' show active' : ''}" id="${tabId}" role="tabpanel"
                 aria-labelledby="${tabId}-tab">
             </div>
         `);
 
-        const contenido = publicacionesDelApartado
-            .map((publicacion) => crearTarjetaPublicacion(publicacion, settings))
-            .join('');
+        const contenido = publicacionesDelApartado.length
+            ? publicacionesDelApartado
+                .map((publicacion) => crearTarjetaPublicacion(publicacion, settings))
+                .join('')
+            : crearMensajeSinPublicaciones();
 
-        $pane.html(contenido || crearMensajeSinArchivos());
+        $pane.html(contenido);
 
         $tabList.append($tab);
         $tabContent.append($pane);
@@ -104,17 +104,26 @@ function renderPublicaciones(data, settings, estado = {}) {
 /**
  * Agrupa las publicaciones por su apartado.
  * @param {Array} publicaciones - Lista de publicaciones activas.
- * @returns {Object} Objeto donde las claves son los apartados y el valor es un array de publicaciones.
+ * @returns {Array} Lista de grupos con nombre del apartado y sus publicaciones.
  */
 function agruparPorApartado(publicaciones) {
-    return publicaciones.reduce((grupos, publicacion) => {
-        const apartado = formatearApartado(publicacion.apartado);
-        if (!grupos[apartado]) {
-            grupos[apartado] = [];
+    const grupos = new Map();
+
+    publicaciones.forEach((publicacion) => {
+        const nombreApartado = obtenerNombreApartado(publicacion);
+        const nombreFormateado = formatearApartado(nombreApartado);
+
+        if (!grupos.has(nombreFormateado)) {
+            grupos.set(nombreFormateado, []);
         }
-        grupos[apartado].push(publicacion);
-        return grupos;
-    }, {});
+
+        grupos.get(nombreFormateado).push(publicacion);
+    });
+
+    return Array.from(grupos, ([nombre, items]) => ({
+        nombre,
+        publicaciones: items
+    }));
 }
 
 /**
@@ -127,17 +136,31 @@ function crearTarjetaPublicacion(publicacion, settings) {
     const titulo = publicacion.nombre || publicacion.titulo || 'Publicación';
     const descripcion = publicacion.descripcion || publicacion.resumen || '';
     const archivos = obtenerArchivos(publicacion);
+    const [archivoPrincipal, ...archivosRestantes] = archivos;
 
-    const listaArchivos = archivos
-        .map((archivo) => crearElementoArchivo(archivo, settings))
+    const tituloConEnlace = archivoPrincipal
+        ? envolverTituloConArchivo(titulo, archivoPrincipal, settings)
+        : titulo;
+
+    const listaArchivos = archivosRestantes
+        .map((archivo, index) => crearElementoArchivo(archivo, settings, {
+            textoAlternativo: `Archivo adicional ${index + 1}`
+        }))
+        .filter(Boolean)
         .join('');
+
+    const contenidoArchivos = listaArchivos
+        ? `<ul class="list-unstyled mb-0">${listaArchivos}</ul>`
+        : archivoPrincipal
+            ? ''
+            : crearMensajeSinArchivos();
 
     return `
         <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">${titulo}</h5>
+            <div class="card-body position-relative">
+                <h5 class="card-title">${tituloConEnlace}</h5>
                 ${descripcion ? `<p class="card-text">${descripcion}</p>` : ''}
-                ${listaArchivos ? `<ul class="list-unstyled mb-0">${listaArchivos}</ul>` : crearMensajeSinArchivos()}
+                ${contenidoArchivos}
             </div>
         </div>
     `;
@@ -147,17 +170,27 @@ function crearTarjetaPublicacion(publicacion, settings) {
  * Devuelve la marca HTML para un archivo individual de la publicación.
  * @param {Object} archivo - Información del archivo.
  * @param {Object} settings - Configuración del módulo.
+ * @param {Object} [opciones] - Opciones adicionales para el renderizado del enlace.
  * @returns {string} HTML generado.
  */
-function crearElementoArchivo(archivo, settings) {
+function crearElementoArchivo(archivo, settings, opciones = {}) {
     const href = construirRutaArchivo(archivo.archivo || archivo.url || archivo.enlace, settings);
 
     if (!href) {
         return '';
     }
 
-    const nombre = archivo.nombre || archivo.titulo || archivo.descripcion || obtenerNombreArchivo(href);
-    const descripcion = archivo.descripcion && archivo.descripcion !== nombre ? `<small class="text-muted d-block">${archivo.descripcion}</small>` : '';
+    const nombreArchivo = obtenerNombreArchivo(href);
+    const nombreCrudo = archivo.nombre || archivo.titulo || archivo.descripcion || nombreArchivo;
+    const nombreGenerico = opciones.textoAlternativo || 'Descargar archivo';
+    const nombre = opciones.textoAlternativo
+        ? opciones.textoAlternativo
+        : nombreCrudo === nombreArchivo
+            ? nombreGenerico
+            : nombreCrudo;
+    const descripcion = archivo.descripcion && archivo.descripcion !== nombreCrudo
+        ? `<small class="text-muted d-block">${archivo.descripcion}</small>`
+        : '';
 
     return `
         <li class="mb-2">
@@ -165,6 +198,23 @@ function crearElementoArchivo(archivo, settings) {
             ${descripcion}
         </li>
     `;
+}
+
+/**
+ * Genera un enlace a partir del título de la publicación y su archivo principal.
+ * @param {string} titulo - Título que se mostrará.
+ * @param {Object} archivo - Archivo principal de la publicación.
+ * @param {Object} settings - Configuración del módulo.
+ * @returns {string} Título envuelto en un enlace o el título original si no hay archivo.
+ */
+function envolverTituloConArchivo(titulo, archivo, settings) {
+    const href = construirRutaArchivo(archivo.archivo || archivo.url || archivo.enlace, settings);
+
+    if (!href) {
+        return titulo;
+    }
+
+    return `<a href="${href}" target="_blank" rel="noopener" class="stretched-link link-primary">${titulo}</a>`;
 }
 
 /**
@@ -193,6 +243,14 @@ function obtenerArchivos(publicacion) {
  */
 function crearMensajeSinArchivos() {
     return '<div class="alert alert-secondary mb-0" role="alert">No hay archivos disponibles.</div>';
+}
+
+/**
+ * Genera el mensaje mostrado cuando un apartado no contiene publicaciones.
+ * @returns {string} HTML con el mensaje.
+ */
+function crearMensajeSinPublicaciones() {
+    return '<div class="alert alert-secondary mb-0" role="alert">No hay publicaciones disponibles en este apartado.</div>';
 }
 
 /**
@@ -261,6 +319,90 @@ function formatearApartado(apartado) {
     }
 
     return apartado.trim() || 'General';
+}
+
+/**
+ * Obtiene el nombre del apartado para una publicación considerando distintos esquemas de datos.
+ * @param {Object} publicacion - Publicación a evaluar.
+ * @returns {string} Nombre del apartado formateado.
+ */
+function obtenerNombreApartado(publicacion) {
+    if (!publicacion) {
+        return 'General';
+    }
+
+    const nombreDirecto = publicacion.apartado_nombre || publicacion.apartadoNombre;
+    if (nombreDirecto) {
+        return formatearApartado(nombreDirecto);
+    }
+
+    if (publicacion.apartado && typeof publicacion.apartado === 'object') {
+        const nombreDesdeObjeto = publicacion.apartado.nombre || publicacion.apartado.titulo || publicacion.apartado.descripcion || publicacion.apartado.name;
+        if (nombreDesdeObjeto) {
+            return formatearApartado(nombreDesdeObjeto);
+        }
+
+        const idDesdeObjeto = obtenerIdApartado(publicacion.apartado);
+        if (idDesdeObjeto !== null && idDesdeObjeto !== undefined) {
+            return `Apartado ${idDesdeObjeto}`;
+        }
+    }
+
+    if (typeof publicacion.apartado === 'string') {
+        return formatearApartado(publicacion.apartado);
+    }
+
+    if (typeof publicacion.apartado === 'number') {
+        return `Apartado ${publicacion.apartado}`;
+    }
+
+    const id = obtenerIdApartado(publicacion);
+    if (id !== null && id !== undefined) {
+        return `Apartado ${id}`;
+    }
+
+    return 'General';
+}
+
+/**
+ * Obtiene el identificador del apartado desde diferentes formas de datos.
+ * @param {Object|number|string} origen - Fuente de datos que puede contener el identificador.
+ * @returns {number|string|null} Identificador encontrado o null si no existe.
+ */
+function obtenerIdApartado(origen) {
+    if (origen === null || origen === undefined) {
+        return null;
+    }
+
+    if (typeof origen === 'number' || (typeof origen === 'string' && origen.trim() !== '' && !isNaN(Number(origen)))) {
+        return origen;
+    }
+
+    if (typeof origen !== 'object') {
+        return null;
+    }
+
+    const posiblesCampos = [
+        'apartado_id',
+        'id_apartado',
+        'apartadoId',
+        'idApartado',
+        'apartadoID',
+        'id',
+        'value',
+        'clave'
+    ];
+
+    for (const campo of posiblesCampos) {
+        if (Object.prototype.hasOwnProperty.call(origen, campo)) {
+            const valor = origen[campo];
+            if (valor !== null && valor !== undefined && valor !== '') {
+                return valor;
+            }
+        }
+    }
+
+    return null;
 }
 
 export default { muestra };
