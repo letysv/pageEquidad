@@ -135,6 +135,8 @@
 
 		const URL_API_ENLACES = URL_BASE + 'api/enlaces';
 
+		const URL_API_ACTIVIDADES = URL_BASE + 'api/actividades';
+
 		const URL_FILES_EQUIPO = URL_BASE + 'storage/equipo/';
 
 		const URL_FILES_NOTAS = URL_BASE + 'storage/notas/';
@@ -148,6 +150,8 @@
 
 		const URL_FILES_INFORMES = URL_BASE + 'storage/informes/';
 
+		const URL_FILES_ACTIVIDADES = URL_BASE + 'storage/actividades/';
+
 		import * as carousel from './resources/views/carousell.js';
 		import * as equipo from './resources/views/equipo.js';
 		import * as notas from './resources/views/notas.js';
@@ -156,6 +160,7 @@
 		import * as efemerides from './resources/views/efemerides.js';
 		import * as informes from './resources/views/informes.js';
 		import * as enlaces from './resources/views/enlaces.js';
+		import * as actividades from './resources/views/actividades.js';
 
 		$(document).ready(function () {
 
@@ -228,7 +233,7 @@
 				url_filesPublicaciones:URL_FILES_PUBLICACIONES,
 				main_container: 'main_container',
                 datacontainer: 'data_container',
-                title: 'Publicaciones y Material de apoyo'
+                title: 'Publicaciones y material de apoyo'
 			}
 
 			const bibliotecaSettings = {
@@ -237,7 +242,7 @@
 				url_filesBiblioteca:URL_FILES_BIBLIOTECA,
 				main_container: 'main_container',
                 datacontainer: 'data_container',
-                title: 'Biblioteca Virtual'
+                title: 'Biblioteca virtual'
 			}
 
 			const efemeridesSettings = {
@@ -253,14 +258,22 @@
 				url_filesInformes:URL_FILES_INFORMES,
 				main_container: 'main_container',
                 datacontainer: 'data_container',
-                title: 'Informes Legislativos'
+                title: 'Informes legislativos'
 			}
 
 			const enlacesSettings = {
 				url_apiEnlaces: URL_API_ENLACES,
 				main_container: 'main_container',
                 datacontainer: 'data_container',
-                title: 'Enlaces Recomendados'
+                title: 'Enlaces recomendados'
+			}
+
+			const actividadesSettings = {
+				url_apiActividades: URL_API_ACTIVIDADES,
+				url_filesActividades:URL_FILES_ACTIVIDADES,
+				main_container: 'main_container',
+                datacontainer: 'data_container',
+                title: 'Actividades realizadass'
 			}
 
 			mostrarContenidoInicial();
@@ -311,6 +324,10 @@
                     event.preventDefault();
                     activarEnlace($(this));
                     enlaces.muestra(enlacesSettings);
+				} else if (destino === '#Actividades') {
+                    event.preventDefault();
+                    activarEnlace($(this));
+                    actividades.muestra(actividadesSettings);
                 } else {
                     event.preventDefault();
                     activarEnlace($(this));
