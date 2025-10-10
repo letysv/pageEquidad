@@ -131,6 +131,8 @@
 
 		const URL_API_EFEMERIDES = URL_BASE + 'api/efemerides';
 
+		const URL_API_INFORMES = URL_BASE + 'api/informes';
+
 		const URL_FILES_EQUIPO = URL_BASE + 'storage/equipo/';
 
 		const URL_FILES_NOTAS = URL_BASE + 'storage/notas/';
@@ -142,12 +144,15 @@
 
 		const URL_FILES_EFEMERIDES = URL_BASE + 'storage/efemerides/';
 
+		const URL_FILES_INFORMES = URL_BASE + 'storage/informes/';
+
 		import * as carousel from './resources/views/carousell.js';
 		import * as equipo from './resources/views/equipo.js';
 		import * as notas from './resources/views/notas.js';
 		import * as publicaciones from './resources/views/publicaciones.js';
 		import * as biblioteca from './resources/views/biblioteca.js';
 		import * as efemerides from './resources/views/efemerides.js';
+		import * as informes from './resources/views/informes.js';
 
 		$(document).ready(function () {
 
@@ -240,6 +245,14 @@
                 title: 'Efemérides'
 			}
 
+			const informesSettings = {
+				url_apiInformes: URL_API_INFORMES,
+				url_filesInformes:URL_FILES_INFORMES,
+				main_container: 'main_container',
+                datacontainer: 'data_container',
+                title: 'Informes Legislativos'
+			}
+
 			mostrarContenidoInicial();
             activarEnlace($('#menu-modulos a[href="#Inicio"]'));
 
@@ -280,6 +293,10 @@
                     event.preventDefault();
                     activarEnlace($(this));
                     efemerides.muestra(efemeridesSettings);
+				} else if (destino === '#Informes') {
+                    event.preventDefault();
+                    activarEnlace($(this));
+                    informes.muestra(informesSettings);
                 } else {
                     event.preventDefault();
                     activarEnlace($(this));
