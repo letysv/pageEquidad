@@ -133,6 +133,8 @@
 
 		const URL_API_INFORMES = URL_BASE + 'api/informes';
 
+		const URL_API_ENLACES = URL_BASE + 'api/enlaces';
+
 		const URL_FILES_EQUIPO = URL_BASE + 'storage/equipo/';
 
 		const URL_FILES_NOTAS = URL_BASE + 'storage/notas/';
@@ -153,6 +155,7 @@
 		import * as biblioteca from './resources/views/biblioteca.js';
 		import * as efemerides from './resources/views/efemerides.js';
 		import * as informes from './resources/views/informes.js';
+		import * as enlaces from './resources/views/enlaces.js';
 
 		$(document).ready(function () {
 
@@ -253,6 +256,13 @@
                 title: 'Informes Legislativos'
 			}
 
+			const enlacesSettings = {
+				url_apiEnlaces: URL_API_ENLACES,
+				main_container: 'main_container',
+                datacontainer: 'data_container',
+                title: 'Enlaces Recomendados'
+			}
+
 			mostrarContenidoInicial();
             activarEnlace($('#menu-modulos a[href="#Inicio"]'));
 
@@ -297,6 +307,10 @@
                     event.preventDefault();
                     activarEnlace($(this));
                     informes.muestra(informesSettings);
+				} else if (destino === '#Enlaces') {
+                    event.preventDefault();
+                    activarEnlace($(this));
+                    enlaces.muestra(enlacesSettings);
                 } else {
                     event.preventDefault();
                     activarEnlace($(this));
