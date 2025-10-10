@@ -66,7 +66,9 @@ function renderEquipo(data, settings, estado = {}) {
             .map((integrante) => {
                 const nombre = integrante.nombre || integrante.titulo || 'Integrante del equipo';
                 const cargo = integrante.cargo || integrante.puesto || '';
-                const descripcion = integrante.descripcion || integrante.resenia || '';
+                const telefono = integrante.telefono || '';
+                const extension = integrante.extension || '';
+                const correo = integrante.correo || '';
                 const foto = obtenerFoto(integrante, settings);
                 const iniciales = !foto ? obtenerIniciales(nombre) : '';
 
@@ -82,7 +84,9 @@ function renderEquipo(data, settings, estado = {}) {
                         <div class="team-member-info">
                             <h5 class="team-member-name">${nombre}</h5>
                             ${cargo ? `<p class="team-member-role text-muted mb-1">${cargo}</p>` : ''}
-                            ${descripcion ? `<p class="team-member-description">${descripcion}</p>` : ''}
+                            ${telefono ? `<p class="team-member-description">${telefono}</p>` : ''}
+                            ${extension ? `<p class="team-member-description">ext. ${extension}</p>` : ''}
+                            ${correo ? `<p class="team-member-description">${correo}</p>` : ''}
                         </div>
                     </div>
                 `;
