@@ -1,0 +1,149 @@
+/* ==========================
+   Módulo de actividades
+   ========================== */
+.actividades-tabs {
+  margin-bottom: 1.5rem;
+  gap: 0.5rem;
+  border-bottom: none;
+}
+
+.actividades-tabs .nav-item {
+  margin-bottom: 0.5rem;
+}
+
+.actividades-tabs .nav-link {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.5rem 1.5rem;
+  color: #4a4a4a;
+  background-color: #f5f7fa;
+  transition: all 0.2s ease-in-out;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.actividades-tabs .nav-link:hover,
+.actividades-tabs .nav-link:focus {
+  color: #1f2937;
+  background-color: #e2e8f0;
+}
+
+.actividades-tabs .nav-link.active {
+  color: #fff;
+  background: linear-gradient(135deg, #1d8a6f, #2fb18c);
+  box-shadow: 0 8px 16px rgba(31, 137, 111, 0.25);
+}
+
+.actividades-tab-content {
+  background-color: transparent;
+}
+
+.actividades-actividad {
+  display: flex;
+  flex-direction: column;
+}
+
+.actividad-descripcion {
+  font-size: 1.05rem;
+  color: #374151;
+  background-color: #f1f5f9;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+}
+
+.actividades-notas {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.actividad-card {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #ffffff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.actividad-card .card-body {
+  padding: 1.75rem;
+}
+
+.actividad-card__title {
+  position: relative;
+  padding-left: 1.5rem;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.actividad-card__title::before {
+  content: '\2013';
+  position: absolute;
+  left: 0;
+  color: #1d8a6f;
+  font-weight: 700;
+}
+
+.actividad-card__fecha {
+  display: inline-block;
+  background-color: rgba(47, 177, 140, 0.08);
+  color: #1d8a6f;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+}
+
+.actividad-card__descripcion {
+  color: #4b5563;
+  line-height: 1.65;
+  margin-bottom: 0;
+}
+
+.actividad-card__galeria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0 1.75rem 1.75rem;
+  background: linear-gradient(180deg, rgba(241, 245, 249, 0.7), rgba(255, 255, 255, 0));
+}
+
+.actividad-card__galeria-item {
+  flex: 1 1 220px;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.actividad-card__imagen {
+  border-radius: 12px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  max-height: 260px;
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.15);
+}
+
+@media (max-width: 768px) {
+  .actividades-tabs {
+    flex-wrap: wrap;
+  }
+
+  .actividad-card .card-body {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .actividad-card__galeria {
+    padding: 0 1.5rem 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .actividades-tabs .nav-link {
+    width: 100%;
+    text-align: center;
+  }
+
+  .actividad-card__galeria-item {
+    flex-basis: 100%;
+  }
+}
