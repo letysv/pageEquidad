@@ -35,6 +35,8 @@ export function muestra(settings = {}) {
  * @param {Object} [estado] - Estado adicional para mostrar mensajes personalizados.
  */
 const PATRON_COLECCIONES_NOTAS = /(notas|notes|items|lista|entries|registros|eventos|actividades|activities)/i;
+const CLAVES_DESCRIPCION_INCLUYE = /(descripcion|detalle|resumen|reseña|resena|nota|texto|contenido|story|body|parrafo|paragraph|mensaje|message|observacion|observación|review|comment|descripciongeneral|descripcion_larga|descripcion_corta|descripcion_nota|descripcionEvento|descripcionActividad)/i;
+const CLAVES_DESCRIPCION_EXCLUYE = /(evento|actividad|imagen|foto|galeria|gallery|url|archivo|ruta|link|enlace|nombre|titulo|fecha|autor|creado|actualizado|modificado|id|uuid|folio|clave|codigo|slug|categoria|contacto)/i;
 
 function renderActividades(data, settings, estado = {}) {
     const actividades = normalizarColeccion(data);
@@ -620,6 +622,7 @@ function obtenerTituloNota(nota = {}) {
  * @returns {string}
  */
 function obtenerDescripcionNota(nota = {}) {
+    const fragmentos = [];
     const candidatos = [
         nota.descripcion,
         nota.resumen,
@@ -644,266 +647,117 @@ function obtenerDescripcionNota(nota = {}) {
     ];
 
     for (const candidato of candidatos) {
-        const texto = normalizarTexto(candidato, true);
-
-        if (texto) {
-            return texto;
+        if (candidato === undefined || candidato === null) {
+            continue;
         }
 
-        if (!texto && candidato && typeof candidato === 'object') {
-            const textoObjeto = extraerTextoDesdeObjeto(candidato);
+        if (typeof candidato === 'string' || typeof candidato === 'number') {
+            agregarFragmentoDescripcion(fragmentos, normalizarTexto(candidato, true));
+            continue;
+        }
 
-            if (textoObjeto) {
-                return textoObjeto;
-            }
+        if (typeof candidato === 'object') {
+            const encontrados = recolectarFragmentosDescripcion(candidato, { forzar: true });
+            encontrados.forEach((texto) => agregarFragmentoDescripcion(fragmentos, texto));
         }
     }
 
-    const descripcionPorClave = buscarDescripcionPorClave(nota);
+    const explorados = recolectarFragmentosDescripcion(nota);
+    explorados.forEach((texto) => agregarFragmentoDescripcion(fragmentos, texto));
 
-    if (descripcionPorClave) {
-        return descripcionPorClave;
-    }
-
-    const descripcionInferida = extraerDescripcionGenerica(nota);
-
-    if (descripcionInferida) {
-        return descripcionInferida;
-    }
-
-    return '';
+    return fragmentos.join('<br>');
 }
 
-function buscarDescripcionPorClave(nota = {}) {
-    if (!nota || typeof nota !== 'object') {
-        return '';
-    }
+function recolectarFragmentosDescripcion(origen, opciones = {}) {
+    const { forzar = false, profundidadMaxima = 6 } = opciones;
+    const fragmentos = [];
+    const visitados = new WeakSet();
+    const pila = [{ valor: origen, clave: opciones.clave || '', forzar, profundidad: 0 }];
 
-    const claves = Object.keys(nota);
-    const incluye = /(descripcion|detalle|resumen|reseña|resena|nota|texto|contenido|story|body)/i;
-    const excluye = /(evento|imagen|foto|galeria|gallery|url|archivo|ruta|link|enlace|nombre|titulo|fecha|autor)/i;
+    while (pila.length) {
+        const { valor, clave, forzar: forzarActual, profundidad } = pila.pop();
 
-    const candidatas = claves
-        .filter((clave) => incluye.test(clave) && !excluye.test(clave))
-        .sort((a, b) => {
-            const prioridad = /(descripcion|detalle)/i;
-            const aPrioridad = prioridad.test(a) ? 0 : /(resumen|nota)/i.test(a) ? 1 : 2;
-            const bPrioridad = prioridad.test(b) ? 0 : /(resumen|nota)/i.test(b) ? 1 : 2;
-
-            if (aPrioridad !== bPrioridad) {
-                return aPrioridad - bPrioridad;
-            }
-
-            return a.localeCompare(b);
-        });
-
-    for (const clave of candidatas) {
-        const valor = nota[clave];
-        const texto = extraerTextoDescripcion(valor);
-
-        if (texto) {
-            return texto;
+        if (valor === undefined || valor === null) {
+            continue;
         }
-    }
 
-    return '';
-}
+        if (profundidad > profundidadMaxima) {
+            continue;
+        }
 
-function extraerTextoDescripcion(valor, profundidad = 0, visitados = new WeakSet()) {
-    if (valor === undefined || valor === null) {
-        return '';
-    }
+        if (typeof valor === 'string' || typeof valor === 'number') {
+            const texto = normalizarTexto(valor, true);
 
-    if (profundidad > 4) {
-        return '';
-    }
-
-    if (typeof valor === 'string' || typeof valor === 'number') {
-        return normalizarTexto(valor, true);
-    }
-
-    if (Array.isArray(valor)) {
-        for (const item of valor) {
-            if (pareceNotaIndependiente(item)) {
+            if (!texto) {
                 continue;
             }
 
-            const texto = extraerTextoDescripcion(item, profundidad + 1, visitados);
-
-            if (texto) {
-                return texto;
+            if (forzarActual || CLAVES_DESCRIPCION_INCLUYE.test(clave)) {
+                agregarFragmentoDescripcion(fragmentos, texto);
             }
+
+            continue;
         }
 
-        return '';
-    }
+        if (typeof valor !== 'object') {
+            continue;
+        }
 
-    if (typeof valor === 'object') {
         if (visitados.has(valor)) {
-            return '';
+            continue;
         }
 
         visitados.add(valor);
 
-        const claves = Object.keys(valor);
-        const incluye = /(descripcion|detalle|resumen|reseña|resena|nota|texto|contenido|story|body)/i;
-        const excluye = /(evento|imagen|foto|galeria|gallery|url|archivo|ruta|link|enlace|nombre|titulo|fecha|autor)/i;
-
-        const ordenadas = claves
-            .filter((clave) => !excluye.test(clave))
-            .sort((a, b) => {
-                const prioridad = /(descripcion|detalle)/i;
-                const aPrioridad = prioridad.test(a) ? 0 : incluye.test(a) ? 1 : 2;
-                const bPrioridad = prioridad.test(b) ? 0 : incluye.test(b) ? 1 : 2;
-
-                if (aPrioridad !== bPrioridad) {
-                    return aPrioridad - bPrioridad;
-                }
-
-                return a.localeCompare(b);
-            });
-
-        for (const clave of ordenadas) {
-            if (PATRON_COLECCIONES_NOTAS.test(clave) && pareceColeccionNotas(valor[clave])) {
+        if (Array.isArray(valor)) {
+            if (!forzarActual && CLAVES_DESCRIPCION_EXCLUYE.test(clave)) {
                 continue;
             }
 
-            const texto = extraerTextoDescripcion(valor[clave], profundidad + 1, visitados);
-
-            if (texto) {
-                return texto;
-            }
-        }
-    }
-
-    return '';
-}
-
-/**
- * Extrae texto desde un objeto que encapsula la descripción.
- * @param {Object} valor - Objeto que podría contener texto.
- * @returns {string}
- */
-function extraerTextoDesdeObjeto(valor = {}) {
-    if (!valor || typeof valor !== 'object') {
-        return '';
-    }
-
-    const candidatos = [
-        valor.texto,
-        valor.descripcion,
-        valor.detalle,
-        valor.contenido,
-        valor.body,
-        valor.html,
-        valor.plain,
-        valor.plano
-    ];
-
-    for (const candidato of candidatos) {
-        const texto = normalizarTexto(candidato, true);
-
-        if (texto) {
-            return texto;
-        }
-    }
-
-    const claves = Object.keys(valor);
-
-    for (const clave of claves) {
-        const texto = normalizarTexto(valor[clave], true);
-
-        if (texto) {
-            return texto;
-        }
-    }
-
-    return '';
-}
-
-/**
- * Busca de forma heurística una descripción dentro de la nota cuando las claves habituales no están presentes.
- * @param {Object} nota - Nota a inspeccionar.
- * @returns {string}
- */
-function extraerDescripcionGenerica(nota = {}) {
-    if (!nota || typeof nota !== 'object') {
-        return '';
-    }
-
-    const visitados = new WeakSet();
-    const incluye = /(descripcion|detalle|resumen|resena|reseña|nota|texto|contenido|story|body)/i;
-    const excluye = /(evento|imagen|foto|galeria|url|archivo|ruta|link|enlace|nombre|titulo|fecha)/i;
-    function explorar(valor, clave = '', profundidad = 0) {
-        if (valor === undefined || valor === null) {
-            return '';
-        }
-
-        if (profundidad > 4) {
-            return '';
-        }
-
-        if (typeof valor === 'string' || typeof valor === 'number') {
-            return normalizarTexto(valor, true);
-        }
-
-        if (Array.isArray(valor)) {
-            if (PATRON_COLECCIONES_NOTAS.test(clave) && valor.some((item) => pareceNotaIndependiente(item))) {
-                return '';
+            if (!forzarActual && PATRON_COLECCIONES_NOTAS.test(clave) && pareceColeccionNotas(valor)) {
+                continue;
             }
 
             for (const item of valor) {
-                const texto = explorar(item, clave, profundidad + 1);
-
-                if (texto) {
-                    return texto;
-                }
+                pila.push({ valor: item, clave, forzar: forzarActual, profundidad: profundidad + 1 });
             }
 
-            return '';
+            continue;
         }
 
-        if (typeof valor === 'object') {
-            if (visitados.has(valor)) {
-                return '';
+        const entradas = Object.entries(valor);
+
+        for (const [subClave, subValor] of entradas) {
+            if (!forzarActual && CLAVES_DESCRIPCION_EXCLUYE.test(subClave)) {
+                continue;
             }
 
-            visitados.add(valor);
-
-            const claves = Object.keys(valor);
-
-            const clavesOrdenadas = [...claves].sort((a, b) => {
-                const aIncluye = incluye.test(a) ? 0 : 1;
-                const bIncluye = incluye.test(b) ? 0 : 1;
-
-                if (aIncluye !== bIncluye) {
-                    return aIncluye - bIncluye;
-                }
-
-                return a.localeCompare(b);
-            });
-
-            for (const key of clavesOrdenadas) {
-                if (excluye.test(key)) {
-                    continue;
-                }
-
-                if (PATRON_COLECCIONES_NOTAS.test(key) && pareceColeccionNotas(valor[key])) {
-                    continue;
-                }
-
-                const texto = explorar(valor[key], key, profundidad + 1);
-
-                if (texto) {
-                    return texto;
-                }
+            if (!forzarActual && PATRON_COLECCIONES_NOTAS.test(subClave) && pareceColeccionNotas(subValor)) {
+                continue;
             }
+
+            const siguienteForzar = forzarActual || CLAVES_DESCRIPCION_INCLUYE.test(subClave);
+            pila.push({ valor: subValor, clave: subClave, forzar: siguienteForzar, profundidad: profundidad + 1 });
         }
-
-        return '';
     }
 
-    return explorar(nota);
+    return fragmentos;
+}
+
+function agregarFragmentoDescripcion(fragmentos, texto) {
+    if (!texto) {
+        return;
+    }
+
+    const llave = texto.replace(/\s+/g, ' ').trim();
+
+    if (!llave) {
+        return;
+    }
+
+    if (!fragmentos.some((existente) => existente.replace(/\s+/g, ' ').trim() === llave)) {
+        fragmentos.push(texto);
+    }
 }
 
 function pareceColeccionNotas(valor) {
