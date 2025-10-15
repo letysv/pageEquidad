@@ -226,34 +226,46 @@ function crearCardLibro(libro, settings) {
     const baseUrlImagenes = settings.baseUrlImagenes || baseUrlArchivos;
     
     const urlArchivo = libro.archivo.startsWith('http') ? libro.archivo : baseUrlArchivos + libro.archivo;
-    const urlImagen = libro.imagen ? 
-        (libro.imagen.startsWith('http') ? libro.imagen : baseUrlImagenes + libro.imagen) : 
+    const urlImagen = libro.imagen ?
+        (libro.imagen.startsWith('http') ? libro.imagen : baseUrlImagenes + libro.imagen) :
         (settings.imagenDefault || 'img/libro-default.jpg');
     
-    const descripcion = libro.descripcion || 'Sin descripción disponible';
     const titulo = libro.titulo || 'Título no disponible';
 
-    return $(`
-        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-            <div class="card libro-card h-100">
-                <div class="card-img-top-container text-center">
-                    <img src="${urlImagen}" 
-                         class="card-img-top libro-imagen" 
-                         alt="${titulo}"
-                         onerror="this.src='${settings.imagenDefault || 'img/libro-default.jpg'}'">
-                </div>
-                <div class="card-body d-flex flex-column">
-                    <a href="${urlArchivo}" 
-                       class="btn btn-primary mt-auto libro-enlace" 
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       title="Abrir libro: ${titulo}">
-                        <i class="fas fa-external-link-alt me-2"></i>Ver Libro
-                    </a>
-                </div>
-            </div>
-        </div>
-    `);
+    // CAMBIO: Usar div simple ya que el grid maneja el layout
+    const $cardContainer = $('<div></div>');
+    const $card = $('<div class="card libro-card h-100"></div>');
+    const $imagenContainer = $('<div class="card-img-top-container"></div>');
+    const $imagen = $('<img>', {
+        src: urlImagen,
+        alt: titulo,
+        class: 'card-img-top libro-imagen'
+    }).on('error', function() {
+        this.src = settings.imagenDefault || 'img/libro-default.jpg';
+    });
+
+    $imagenContainer.append($imagen);
+
+    const $cardBody = $('<div class="card-body d-flex flex-column"></div>');
+    
+    const $enlace = $('<a></a>', {
+        href: urlArchivo,
+        class: 'btn btn-primary libro-enlace',
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        title: `Abrir libro: ${titulo}`,
+        'data-bs-toggle': 'tooltip',
+        'data-bs-placement': 'top'
+    });
+
+    const $icono = $('<i class="fas fa-external-link-alt me-2"></i>');
+    $enlace.append($icono, 'Ver Libro');
+
+    $cardBody.append($enlace);
+    $card.append($imagenContainer, $cardBody);
+    $cardContainer.append($card);
+
+    return $cardContainer;
 }
 
 /**

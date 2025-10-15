@@ -1,6 +1,6 @@
 /* Biblioteca - Estilos Mejorados */
 .biblioteca-categorias {
-  max-width: 26rem;
+  max-width: 100%;
   margin-top: 1.5rem;
   padding-bottom: 8rem;
 }
@@ -9,7 +9,7 @@
   width: 100%;
 }
 
-/* Cards de libros mejorados */
+/* Cards de libros mejorados - IMAGEN MÁS PEQUEÑA */
 .libro-card {
   transition: all 0.3s ease;
   border: 1px solid #e9ecef;
@@ -18,7 +18,9 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;
+  max-width: 300px; /* Ancho máximo para la card */
+  margin: 0 auto; /* Centrar la card */
 }
 
 .libro-card:hover {
@@ -29,21 +31,22 @@
 
 .card-img-top-container {
   background-color: #f8f9fa;
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 220px;
+  position: relative;
+  width: 100%;
+  padding-top: 70%; /* REDUCIDO: Menor relación de aspecto para imagen más pequeña */
   border-bottom: 1px solid #e9ecef;
+  overflow: hidden;
 }
 
 .libro-imagen {
-  max-height: 160px;
-  width: auto;
-  max-width: 100%;
-  height: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   transition: transform 0.3s ease;
+  padding: 1rem; /* Espacio alrededor de la imagen */
 }
 
 .libro-card:hover .libro-imagen {
@@ -51,42 +54,19 @@
 }
 
 .card-body {
-  padding: 1.25rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-}
-
-.libro-titulo {
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.4;
-  margin-bottom: 0.75rem;
-  color: #212529;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  flex-grow: 1;
-}
-
-.libro-descripcion {
-  font-size: 0.875rem;
-  color: #6c757d;
-  margin-bottom: 1rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  flex-grow: 1;
+  align-items: center;
+  background-color: #f8f9fa;
 }
 
 .libro-enlace {
   border-radius: 6px;
   font-weight: 500;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.5rem;
   transition: all 0.2s ease;
-  margin-top: auto;
+  width: auto;
 }
 
 .libro-enlace:hover {
@@ -107,24 +87,57 @@
   color: #dee2e6;
 }
 
-/* Responsive */
-@media screen and (max-width: 736px) {
+/* NUEVO: Contenedor de grid modificado para múltiples cards */
+.biblioteca-libros__contenido {
+  width: 100%;
+}
+
+#biblioteca-libros-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Grid responsive */
+  gap: 1.5rem;
+}
+
+/* ELIMINAMOS las clases de Bootstrap columns ya que usamos grid */
+.col-12 {
+  margin-bottom: 0; /* Quitamos el margin-bottom porque el gap del grid lo maneja */
+}
+
+/* RESPONSIVE */
+@media screen and (max-width: 768px) {
   .biblioteca-categorias {
     max-width: none;
     padding-bottom: 10rem;
   }
   
-  .col-lg-3, .col-md-4, .col-sm-6 {
-    margin-bottom: 1.5rem;
+  #biblioteca-libros-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Más pequeño en móvil */
+    gap: 1rem;
+  }
+  
+  .libro-card {
+    max-width: 100%; /* En móvil ocupa el ancho disponible del grid */
   }
   
   .card-img-top-container {
-    min-height: 180px;
-    padding: 1rem;
+    padding-top: 60%; /* Aún más compacto en móvil */
+  }
+}
+
+@media screen and (max-width: 576px) {
+  #biblioteca-libros-grid {
+    grid-template-columns: 1fr; /* Una columna en móviles muy pequeños */
+    gap: 1rem;
   }
   
-  .libro-imagen {
-    max-height: 140px;
+  .card-img-top-container {
+    padding-top: 50%; /* Muy compacto */
+  }
+  
+  .libro-enlace {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
   }
 }
 
