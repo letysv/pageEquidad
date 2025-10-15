@@ -186,7 +186,8 @@ function renderLibros(libros, nombreCategoria, settings) {
     
     if (!libros.length) {
         $librosContainer.html(`
-            <div class="alert alert-info" role="alert">
+            <div class="biblioteca-libros__vacio">
+                <i class="fas fa-book-open"></i>
                 <h4>${nombreCategoria}</h4>
                 <p>No hay libros disponibles en esta categoría.</p>
             </div>
@@ -197,14 +198,16 @@ function renderLibros(libros, nombreCategoria, settings) {
     const $contenidoLibros = $(`
         <div class="biblioteca-libros__contenido">
             <h3 class="mb-4">${nombreCategoria}</h3>
-            <div class="row" id="biblioteca-libros-grid"></div>
+            <div class="row g-4" id="biblioteca-libros-grid"></div>
         </div>
     `);
 
     const $grid = $contenidoLibros.find('#biblioteca-libros-grid');
     
-    libros.forEach(libro => {
+    // Agregar animación escalonada
+    libros.forEach((libro, index) => {
         const $libroCard = crearCardLibro(libro, settings);
+        $libroCard.css('animation-delay', `${index * 0.1}s`);
         $grid.append($libroCard);
     });
 
@@ -228,15 +231,15 @@ function crearCardLibro(libro, settings) {
         (settings.imagenDefault || 'img/libro-default.jpg');
     
     const descripcion = libro.descripcion || 'Sin descripción disponible';
+    const titulo = libro.titulo || 'Título no disponible';
 
     return $(`
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
             <div class="card libro-card h-100">
-                <div class="card-img-top-container text-center p-3">
+                <div class="card-img-top-container text-center">
                     <img src="${urlImagen}" 
                          class="card-img-top libro-imagen" 
-                         alt="${libro.titulo}"
-                         style="max-height: 200px; width: auto; object-fit: contain;"
+                         alt="${titulo}"
                          onerror="this.src='${settings.imagenDefault || 'img/libro-default.jpg'}'">
                 </div>
                 <div class="card-body d-flex flex-column">
@@ -244,8 +247,8 @@ function crearCardLibro(libro, settings) {
                        class="btn btn-primary mt-auto libro-enlace" 
                        target="_blank"
                        rel="noopener noreferrer"
-                       title="Abrir libro: ${libro.titulo}">
-                        Ver Libro
+                       title="Abrir libro: ${titulo}">
+                        <i class="fas fa-external-link-alt me-2"></i>Ver Libro
                     </a>
                 </div>
             </div>
