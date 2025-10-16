@@ -31,10 +31,7 @@
 		</header>
 		<nav id="nav">
 			<ul id="menu-modulos">
-				<li><a href="#Inicio" class="active">
-					 <img src="storage/iconos/inicio.png" alt="Inicio" class="menu-icon">
-					Inicio
-				</a></li>
+				<li><a href="#Inicio" class="active">Inicio</a></li>
 				<li><a href="#Notas">Notas</a></li>
 				<li><a href="#Equipo">Equipo CEIGyDH</a></li>
 				<li><a href="#Publicaciones">Publicaciones</a></li>
@@ -44,6 +41,7 @@
 				<li><a href="#Enlaces">Enlaces Recomendados</a></li>
 				<li><a href="#Actividades">Actividades Realizadas</a></li>
 				<li><a href="#Aviso">Aviso de privacidad</a></li>
+				<li><a href="#Sala">Sala de lactancia</a></li>
 			</ul>
 		</nav>
 		<!-- <footer>
@@ -145,6 +143,8 @@
 
 		const URL_API_ACTIVIDADES = URL_BASE + 'api/actividades';
 
+		const URL_API_LACTANCIA = URL_BASE + 'api/lactancia';
+
 		const URL_FILES_EQUIPO = URL_BASE + 'storage/equipo/';
 
 		const URL_FILES_NOTAS = URL_BASE + 'storage/notas/';
@@ -160,6 +160,8 @@
 
 		const URL_FILES_ACTIVIDADES = URL_BASE + 'storage/actividades/';
 
+		const URL_FILES_LACTANCIA = URL_BASE + 'storage/lactancia/';
+
 		import * as carousel from './resources/views/carousell.js';
 		import * as equipo from './resources/views/equipo.js';
 		import * as notas from './resources/views/notas.js';
@@ -170,6 +172,7 @@
 		import * as enlaces from './resources/views/enlaces.js';
 		import * as actividades from './resources/views/actividades.js';
 		import * as aviso from './resources/views/aviso.js';
+		import * as sala from './resources/views/lactancia.js';
 
 		$(document).ready(function () {
 
@@ -184,7 +187,8 @@
             'Informes': 'informes.png',
             'Enlaces': 'municipal.png',
             'Actividades': 'default.png',
-            'Aviso': 'default.png'
+            'Aviso': 'default.png',
+			'Sala': 'default.png',
         };
 
         $('#menu-modulos a').each(function() {
@@ -325,6 +329,14 @@
                 title: 'Aviso de privacidad del centro de estudios para la igualdad de género y derechos humanos',
 			}
 
+			const lactanciaSettings = {
+				url_apiLactancia: URL_API_LACTANCIA,
+				url_filesLactancia:URL_FILES_LACTANCIA,
+				main_container: 'main_container',
+                datacontainer: 'data_container',
+                title: 'Sala de lactancia'
+			}
+
 			mostrarContenidoInicial();
             activarEnlace($('#menu-modulos a[href="#Inicio"]'));
 
@@ -381,6 +393,10 @@
                     event.preventDefault();
                     activarEnlace($(this));
                     aviso.muestra(avisoSettings);
+				} else if (destino === '#Sala') {
+                    event.preventDefault();
+                    activarEnlace($(this));
+                    sala.muestra(lactanciaSettings);
                 } else {
                     event.preventDefault();
                     activarEnlace($(this));
