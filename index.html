@@ -39,6 +39,7 @@
 				<li><a href="#Informes">Informes Legislativos</a></li>
 				<li><a href="#Enlaces">Enlaces Recomendados</a></li>
 				<li><a href="#Actividades">Actividades Realizadas</a></li>
+				<li><a href="#Aviso">Aviso de privacidad</a></li>
 			</ul>
 		</nav>
 		<!-- <footer>
@@ -164,6 +165,7 @@
 		import * as informes from './resources/views/informes.js';
 		import * as enlaces from './resources/views/enlaces.js';
 		import * as actividades from './resources/views/actividades.js';
+		import * as aviso from './resources/views/aviso.js';
 
 		$(document).ready(function () {
 
@@ -283,6 +285,12 @@
                 title: 'Actividades realizadas'
 			}
 
+			const avisoSettings = {
+				main_container: 'main_container',
+                datacontainer: 'data_container',
+                title: 'Aviso de privacidad del centro de estudios para la igualdad de género y derechos humanos',
+			}
+
 			mostrarContenidoInicial();
             activarEnlace($('#menu-modulos a[href="#Inicio"]'));
 
@@ -335,6 +343,10 @@
                     event.preventDefault();
                     activarEnlace($(this));
                     actividades.muestra(actividadesSettings);
+				} else if (destino === '#Aviso') {
+                    event.preventDefault();
+                    activarEnlace($(this));
+                    aviso.muestra(avisoSettings);
                 } else {
                     event.preventDefault();
                     activarEnlace($(this));
