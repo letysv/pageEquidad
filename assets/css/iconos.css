@@ -1,0 +1,36 @@
+/* Estilos para los íconos del menú */
+.menu-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+    vertical-align: middle;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+#menu-modulos a {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    text-decoration: none;
+    color: inherit;
+}
+
+#menu-modulos li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#menu-modulos a:hover .menu-icon {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+#menu-modulos a.active .menu-icon {
+    opacity: 1;
+    filter: brightness(0) invert(1);
+}
+
+/* Asegurar que el texto se alinee correctamente */
+#menu-modulos a span {
+    flex: 1;
+}

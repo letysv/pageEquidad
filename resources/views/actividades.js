@@ -35,7 +35,7 @@ export function muestra(settings = {}) {
 function renderActividades(data, settings, estado = {}) {
     const actividades = normalizarColeccion(data);
     const actividadesActivas = actividades.filter((actividad) => estaActiva(actividad));
-    const actividadesAgrupadas = agruparActividadesPorEvento(actividadesActivas, settings);
+    const actividadesAgrupadas = agruparYProcesarActividades(actividadesActivas, settings);
     
     console.log('Actividades agrupadas:', actividadesAgrupadas); // Para debug
     
@@ -134,20 +134,32 @@ function crearTarjetaNota(nota, settings) {
     const lugar = obtenerLugarNota(nota);
     const imagenUrl = obtenerImagenNota(nota, settings);
 
-    console.log('Creando tarjeta para nota:', { titulo, imagenUrl }); // Para debug
+    console.log('Creando tarjeta para nota:', { 
+        titulo, 
+        imagenUrl,
+        tieneDescripcion: !!descripcion,
+        tieneFecha: !!fecha,
+        tieneLugar: !!lugar
+    });
+
+    // Construir el contenido de la imagen si existe
+    let contenidoImagen = '';
+    if (imagenUrl) {
+        contenidoImagen = `
+            <div class="nota-imagen-container">
+                <img src="${imagenUrl}" 
+                     alt="${titulo || 'Imagen de la actividad'}" 
+                     class="nota-imagen card-img-top"
+                     loading="lazy"
+                     onerror="this.style.display='none'">
+            </div>
+        `;
+    }
 
     const $card = $(`
         <div class="col-lg-6 col-xl-4 mb-4">
             <div class="nota-card card h-100 shadow-sm">
-                ${imagenUrl ? `
-                    <div class="nota-imagen-container">
-                        <img src="${imagenUrl}" 
-                             alt="${titulo || 'Imagen de la actividad'}" 
-                             class="nota-imagen card-img-top"
-                             loading="lazy"
-                             onerror="this.style.display='none'">
-                    </div>
-                ` : ''}
+                ${contenidoImagen}
                 
                 <div class="card-body">
                     ${titulo ? `<h3 class="nota-titulo h5">${titulo}</h3>` : ''}
@@ -167,9 +179,9 @@ function crearTarjetaNota(nota, settings) {
 }
 
 /**
- * Agrupa actividades por evento
+ * Agrupa y procesa actividades por evento, asegurando que cada nota tenga su imagen correspondiente
  */
-function agruparActividadesPorEvento(actividades = [], settings) {
+function agruparYProcesarActividades(actividades = [], settings) {
     const grupos = new Map();
 
     actividades.forEach((actividad) => {
@@ -200,46 +212,67 @@ function agruparActividadesPorEvento(actividades = [], settings) {
 
         const grupo = grupos.get(eventoId);
         
-        // Procesar la actividad principal como nota individual
-        if (actividad.descripcion || actividad.titulo || actividad.imagen) {
-            const imagenUrl = construirUrlImagenCompleta(settings.url_filesActividades, actividad.imagen || actividad.archivo);
-            console.log('Procesando actividad principal:', { 
-                titulo: actividad.titulo, 
+        // Procesar CADA ITEM como una nota individual con su propia imagen
+        if (actividad.items && Array.isArray(actividad.items)) {
+            actividad.items.forEach(item => {
+                if (item && typeof item === 'object') {
+                    const imagenUrl = construirUrlImagenCompleta(
+                        settings.url_filesActividades, 
+                        item.imagen || item.archivo || actividad.imagen || actividad.archivo
+                    );
+                    
+                    console.log('Procesando ITEM como nota:', { 
+                        titulo: item.titulo || item.nombre,
+                        descripcion: item.descripcion,
+                        imagenItem: item.imagen,
+                        archivoItem: item.archivo,
+                        imagenActividad: actividad.imagen,
+                        archivoActividad: actividad.archivo,
+                        imagenUrlConstruida: imagenUrl
+                    });
+                    
+                    // Crear nota individual para cada item
+                    const nota = {
+                        titulo: item.titulo || item.nombre || actividad.titulo || actividad.nombre || '',
+                        descripcion: item.descripcion || actividad.descripcion || '',
+                        fecha: item.fecha || actividad.fecha,
+                        lugar: item.lugar || actividad.lugar,
+                        imagen: imagenUrl
+                    };
+                    
+                    // Solo agregar si tiene contenido válido
+                    if (nota.descripcion || nota.titulo || nota.imagen) {
+                        grupo.notas.push(nota);
+                        console.log('✅ Nota agregada:', nota.titulo);
+                    }
+                }
+            });
+        } else {
+            // Si no hay items, procesar la actividad principal como una nota
+            const imagenUrl = construirUrlImagenCompleta(
+                settings.url_filesActividades, 
+                actividad.imagen || actividad.archivo
+            );
+            
+            console.log('Procesando ACTIVIDAD como nota:', { 
+                titulo: actividad.titulo || actividad.nombre,
                 imagen: actividad.imagen,
                 archivo: actividad.archivo,
-                imagenUrl 
+                imagenUrl
             });
             
-            grupo.notas.push({
+            const nota = {
                 titulo: actividad.titulo || actividad.nombre || '',
                 descripcion: actividad.descripcion || '',
                 fecha: actividad.fecha,
                 lugar: actividad.lugar,
                 imagen: imagenUrl
-            });
-        }
-
-        // Procesar items como notas individuales
-        if (actividad.items && Array.isArray(actividad.items)) {
-            actividad.items.forEach(item => {
-                if (item.descripcion || item.titulo || item.imagen || item.archivo) {
-                    const itemImagenUrl = construirUrlImagenCompleta(settings.url_filesActividades, item.imagen || item.archivo);
-                    console.log('Procesando item:', { 
-                        titulo: item.titulo, 
-                        imagen: item.imagen,
-                        archivo: item.archivo,
-                        itemImagenUrl 
-                    });
-                    
-                    grupo.notas.push({
-                        titulo: item.titulo || item.nombre || '',
-                        descripcion: item.descripcion || '',
-                        fecha: item.fecha || actividad.fecha,
-                        lugar: item.lugar || actividad.lugar,
-                        imagen: itemImagenUrl
-                    });
-                }
-            });
+            };
+            
+            if (nota.descripcion || nota.titulo || nota.imagen) {
+                grupo.notas.push(nota);
+                console.log('✅ Actividad agregada como nota:', nota.titulo);
+            }
         }
     });
 
@@ -254,11 +287,6 @@ function obtenerImagenNota(nota, settings) {
         return nota.imagen;
     }
     
-    // Si no hay imagen directa, intentar construirla desde archivo
-    if (nota.archivo && typeof nota.archivo === 'string') {
-        return construirUrlImagenCompleta(settings.url_filesActividades, nota.archivo);
-    }
-    
     return null;
 }
 
@@ -267,25 +295,25 @@ function obtenerImagenNota(nota, settings) {
  */
 function construirUrlImagenCompleta(baseUrl, archivo) {
     if (!archivo || typeof archivo !== 'string') {
-        console.log('Archivo no válido:', archivo);
+        console.log('❌ Archivo no válido:', archivo);
         return null;
     }
 
     // Si ya es una URL completa, retornarla
     if (archivo.startsWith('http') || archivo.startsWith('//')) {
-        console.log('URL completa encontrada:', archivo);
+        console.log('🌐 URL completa encontrada:', archivo);
         return archivo;
     }
 
     // Si no tiene baseUrl, retornar el archivo tal cual
     if (!baseUrl) {
-        console.log('Sin baseUrl, retornando archivo:', archivo);
+        console.log('📁 Sin baseUrl, retornando archivo:', archivo);
         return archivo;
     }
 
     // Construir URL completa
     const urlCompleta = baseUrl + archivo.replace(/^\//, '');
-    console.log('URL construida:', urlCompleta);
+    console.log('🔗 URL construida:', urlCompleta);
     return urlCompleta;
 }
 
@@ -331,16 +359,49 @@ function formatearFecha(fecha) {
     if (!fecha) return '';
     
     try {
-        const date = new Date(fecha);
-        if (isNaN(date.getTime())) return fecha;
+        // Si la fecha ya está formateada, retornarla tal cual
+        if (typeof fecha === 'string' && fecha.includes(' de ')) {
+            return fecha;
+        }
+        
+        let date;
+        
+        // Manejar diferentes formatos de fecha
+        if (typeof fecha === 'string') {
+            // Formato YYYY-MM-DD - usar constructor local
+            if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+                const [anio, mes, dia] = fecha.split('-').map(Number);
+                date = new Date(anio, mes - 1, dia);
+            } 
+            // Formato YYYY-MM-DD HH:MM:SS - ajustar a local
+            else if (/^\d{4}-\d{2}-\d{2}[\sT]/.test(fecha)) {
+                date = new Date(fecha);
+                // Ajustar por diferencia de zona horaria
+                date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
+            }
+            // Otros formatos
+            else {
+                date = new Date(fecha);
+            }
+        } else if (fecha instanceof Date) {
+            date = fecha;
+        } else {
+            return String(fecha);
+        }
+        
+        if (isNaN(date.getTime())) {
+            return String(fecha);
+        }
         
         const dia = date.getDate();
         const mes = date.toLocaleString('es-ES', { month: 'long' });
         const anio = date.getFullYear();
         
         return `${dia} de ${mes} de ${anio}`;
+        
     } catch (e) {
-        return fecha;
+        console.error('Error formateando fecha:', fecha, e);
+        return String(fecha);
     }
 }
 

@@ -15,6 +15,7 @@
 	<!-- <link rel="stylesheet" href="assets/css/actividades.css" /> -->
 	<!-- <link rel="stylesheet" href="assets/css/avisos.css" /> -->
 	<!-- <link rel="stylesheet" href="assets/css/modulos.css" /> -->
+	 <link rel="stylesheet" href="assets/css/iconos.css" />
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
 		integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 
@@ -30,7 +31,10 @@
 		</header>
 		<nav id="nav">
 			<ul id="menu-modulos">
-				<li><a href="#Inicio" class="active">Inicio</a></li>
+				<li><a href="#Inicio" class="active">
+					 <img src="storage/iconos/inicio.png" alt="Inicio" class="menu-icon">
+					Inicio
+				</a></li>
 				<li><a href="#Notas">Notas</a></li>
 				<li><a href="#Equipo">Equipo CEIGyDH</a></li>
 				<li><a href="#Publicaciones">Publicaciones</a></li>
@@ -169,6 +173,34 @@
 
 		$(document).ready(function () {
 
+			function agregarIconosMenu() {
+        const iconos = {
+            'Inicio': 'inicio.png',
+            'Notas': 'notas.png',
+            'Equipo': 'default.png',
+            'Publicaciones': 'publicaciones.png',
+            'Biblioteca': 'biblioteca.png',
+            'Efemerides': 'default.png',
+            'Informes': 'informes.png',
+            'Enlaces': 'municipal.png',
+            'Actividades': 'default.png',
+            'Aviso': 'default.png'
+        };
+
+        $('#menu-modulos a').each(function() {
+            const $enlace = $(this);
+            const textoOriginal = $enlace.text().trim();
+            const href = $enlace.attr('href').replace('#', '');
+            
+            let iconoNombre = iconos[textoOriginal] || iconos[href];
+            
+            if (iconoNombre) {
+                const iconoUrl = URL_FILES_ICONOS + iconoNombre;
+                $enlace.html(`<img src="${iconoUrl}" alt="${textoOriginal}" class="menu-icon"> ${textoOriginal}`);
+            }
+        });
+    }
+
         	const defaultContent = `
             	<header class="major">
                 	<h2>¿Qué es el Centro de Estudios Para la Igualdad de Género y Derechos Humanos?</h2>
@@ -215,6 +247,8 @@
                 $('#menu-modulos a').removeClass('active');
                 $enlace.addClass('active');
             }
+
+			agregarIconosMenu();
 
             const equipoSettings = {
                 url_apiEquipos: URL_API_EQUIPOS,
