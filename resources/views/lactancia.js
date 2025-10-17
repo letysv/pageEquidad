@@ -1,6 +1,6 @@
 /**
  * Módulo encargado de renderizar la información de la sala de lactancia.
- * Muestra la descripción, la imagen y el archivo descargable expuestos por la API.
+ * Muestra la descripción, el link al archivo con su nombre, y la imagen.
  */
 export function muestra(settings = {}) {
     const url = settings.url_apiLactancia || settings.url_api;
@@ -58,52 +58,172 @@ function renderLactancia(data, settings, estado = {}) {
         return;
     }
 
-    const descripcion = obtenerDescripcion(registro);
-    const archivoUrl = obtenerArchivo(registro, settings);
-    const imagenUrl = obtenerImagen(registro, settings);
+    // Extraer la información específica que necesitas
+    const informacion = extraerInformacionLactancia(registro, settings);
 
     const $tarjeta = $('<div class="lactancia-contenido card shadow-sm"></div>');
     const $cuerpo = $('<div class="card-body"></div>');
 
-    if (imagenUrl) {
+    // Mostrar descripción PRIMERO
+    if (informacion.descripcion) {
+        const $descripcion = $(`
+            <div class="lactancia-descripcion mb-4">
+                <div class="descripcion-contenido fs-6">${informacion.descripcion}</div>
+            </div>
+        `);
+        $cuerpo.append($descripcion);
+    } else {
+        $cuerpo.append(`
+            <div class="alert alert-warning">
+                <p class="text-muted mb-0">No hay descripción disponible en este momento.</p>
+            </div>
+        `);
+    }
+
+    // Mostrar archivos PDF SEGUNDO - NOMBRE COMO LINK
+    const archivosPdf = informacion.archivos.filter(archivo => archivo.esPdf);
+    if (archivosPdf.length > 0) {
+        const $archivosSection = $(`
+            <div class="lactancia-archivos mt-4">
+                <h5 class="text-success mb-3">
+                </h5>
+            </div>
+        `);
+
+        archivosPdf.forEach(archivo => {
+            const $archivo = $(`
+                <div class="archivo-item p-3 bg-light rounded mb-3">
+                    <div class="file-info">
+                        <a href="${archivo.url}" 
+                           target="_blank" 
+                           rel="noopener"
+                           class="text-primary text-decoration-none fw-bold">
+                            ${archivo.nombre}
+                        </a>
+                    </div>
+                </div>
+            `);
+            $archivosSection.append($archivo);
+        });
+
+        $cuerpo.append($archivosSection);
+    }
+
+    // Mostrar imagen AL FINAL - DEBAJO DE LOS ARCHIVOS
+    if (informacion.imagenUrl) {
         const $contenedorImagen = $(`
-            <div class="lactancia-imagen text-center mb-4">
-                <img src="${imagenUrl}"
-                     alt="${titulo}"
-                     class="img-fluid"
+            <div class="lactancia-imagen text-center mt-4">
+                <img src="${informacion.imagenUrl}"
+                     alt="${informacion.nombreImagen || titulo}"
+                     class="img-fluid rounded shadow"
+                     style="max-height: 500px; object-fit: contain;"
                      loading="lazy"
-                     onerror="this.style.display='none'">
+                     onerror="this.style.display='none'; console.error('Error cargando imagen:', this.src)">
             </div>
         `);
 
         $cuerpo.append($contenedorImagen);
-    }
-
-    if (descripcion) {
-        const $descripcion = $('<div class="lactancia-descripcion"></div>');
-        $descripcion.html(descripcion);
-        $cuerpo.append($descripcion);
     } else {
         $cuerpo.append(`
-            <p class="text-muted">No hay descripción disponible en este momento.</p>
-        `);
-    }
-
-    if (archivoUrl) {
-        const nombreArchivo = obtenerNombreArchivo(archivoUrl);
-        const $archivo = $(`
-            <div class="lactancia-archivo mt-4">
-                <a class="btn btn-primary" href="${archivoUrl}" target="_blank" rel="noopener">
-                    Descargar ${nombreArchivo}
-                </a>
+            <div class="alert alert-secondary mt-4">
+                <p class="text-muted mb-0">No hay imagen disponible para mostrar.</p>
             </div>
         `);
-
-        $cuerpo.append($archivo);
     }
 
     $tarjeta.append($cuerpo);
     $mainContainer.append($tarjeta);
+}
+
+/**
+ * Extrae la información específica de lactancia que necesitas
+ */
+function extraerInformacionLactancia(registro, settings) {
+    const baseUrl = settings.url_filesLactancia || settings.url_files || '';
+    
+    // Obtener descripción del registro principal
+    const descripcion = obtenerDescripcion(registro);
+    
+    // Procesar items para separar imágenes y archivos
+    const items = obtenerItems(registro, settings);
+    const { imagenes, archivos } = procesarItems(items, baseUrl);
+    
+    // Tomar la primera imagen encontrada (o null si no hay)
+    const primeraImagen = imagenes.length > 0 ? imagenes[0] : null;
+    
+    return {
+        descripcion: descripcion,
+        imagenUrl: primeraImagen ? primeraImagen.url : '',
+        nombreImagen: primeraImagen ? primeraImagen.nombre : '',
+        archivos: archivos
+    };
+}
+
+/**
+ * Procesa los items para separar imágenes de archivos PDF
+ */
+function procesarItems(items, baseUrl) {
+    const imagenes = [];
+    const archivos = [];
+    
+    items.forEach(item => {
+        if (item.archivo) {
+            const urlCompleta = construirUrl(baseUrl, item.archivo);
+            const esImagen = esUrlDeImagen(urlCompleta);
+            const esPdf = urlCompleta.toLowerCase().includes('.pdf');
+            
+            const itemProcesado = {
+                url: urlCompleta,
+                nombre: item.nombre || 'Sin nombre',
+                esImagen: esImagen,
+                esPdf: esPdf,
+                tipo: esImagen ? 'imagen' : (esPdf ? 'pdf' : 'archivo')
+            };
+            
+            if (esImagen) {
+                imagenes.push(itemProcesado);
+            } else {
+                archivos.push(itemProcesado);
+            }
+        }
+    });
+    
+    return { imagenes, archivos };
+}
+
+/**
+ * Verifica si una URL es de imagen
+ */
+function esUrlDeImagen(url) {
+    if (!url) return false;
+    const extensionesImagen = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'];
+    return extensionesImagen.some(ext => url.toLowerCase().includes(ext));
+}
+
+/**
+ * Obtiene los items relacionados si existen
+ */
+function obtenerItems(registro, settings) {
+    if (!registro || typeof registro !== 'object') {
+        return [];
+    }
+
+    // Buscar items en diferentes propiedades posibles
+    const candidatos = [
+        registro.items,
+        registro.lactancia_items,
+        registro.related_items,
+        registro.child_items,
+        registro.archivos
+    ];
+
+    for (const candidato of candidatos) {
+        if (Array.isArray(candidato) && candidato.length > 0) {
+            return candidato;
+        }
+    }
+
+    return [];
 }
 
 /**
@@ -162,78 +282,26 @@ function obtenerDescripcion(registro) {
 }
 
 /**
- * Obtiene la URL del archivo asociado al registro.
+ * Construye una URL absoluta en base a una ruta y un prefijo.
  */
-function obtenerArchivo(registro, settings) {
-    if (!registro || typeof registro !== 'object') {
+function construirUrl(base, ruta) {
+    if (!ruta) {
         return '';
     }
 
-    const base = settings.url_filesLactancia || settings.url_files || '';
-    const candidatos = [
-        registro.archivo,
-        registro.file,
-        registro.documento,
-        registro.ruta_archivo,
-        registro.url_archivo,
-        registro.link
-    ];
-
-    for (const candidato of candidatos) {
-        const ruta = normalizarTexto(candidato);
-        const url = construirUrl(base, ruta);
-        if (url) {
-            return url;
-        }
+    if (/^https?:\/\//i.test(ruta)) {
+        return ruta;
     }
 
-    return '';
-}
-
-/**
- * Obtiene la URL de la imagen del registro.
- */
-function obtenerImagen(registro, settings) {
-    if (!registro || typeof registro !== 'object') {
-        return '';
+    if (!base) {
+        return ruta;
     }
 
-    const base = settings.url_filesLactancia || settings.url_files || '';
-    const candidatos = [
-        registro.imagen,
-        registro.image,
-        registro.foto,
-        registro.url_imagen,
-        registro.ruta_imagen,
-        registro.portada
-    ];
-
-    for (const candidato of candidatos) {
-        const ruta = normalizarTexto(candidato);
-        const url = construirUrl(base, ruta);
-        if (url) {
-            return url;
-        }
+    if (!base.endsWith('/') && ruta[0] !== '/') {
+        return `${base}/${ruta}`;
     }
 
-    return '';
-}
-
-/**
- * Devuelve el nombre legible del archivo.
- */
-function obtenerNombreArchivo(url) {
-    if (!url) {
-        return 'archivo';
-    }
-
-    try {
-        const partes = url.split('/');
-        const nombre = partes[partes.length - 1] || 'archivo';
-        return nombre;
-    } catch (e) {
-        return 'archivo';
-    }
+    return `${base}${ruta}`;
 }
 
 /**
@@ -267,27 +335,4 @@ function normalizarTexto(valor) {
     }
 
     return '';
-}
-
-/**
- * Construye una URL absoluta en base a una ruta y un prefijo.
- */
-function construirUrl(base, ruta) {
-    if (!ruta) {
-        return '';
-    }
-
-    if (/^https?:\/\//i.test(ruta)) {
-        return ruta;
-    }
-
-    if (!base) {
-        return ruta;
-    }
-
-    if (!base.endsWith('/') && ruta[0] !== '/') {
-        return `${base}/${ruta}`;
-    }
-
-    return `${base}${ruta}`;
 }
