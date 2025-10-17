@@ -66,6 +66,9 @@ function muestraNotas(data, settings) {
             'alt': nota.nombre || 'Imagen de la nota'
         });
 
+        // Formatear la fecha
+        const fechaFormateada = formatearFecha(nota.fecha);
+
         // Se crea el elemento de la tarjeta
         const $item = $(`
             <div class="card" style="width: 18rem; margin-right: 10px; margin-bottom: 10px; cursor: pointer;">
@@ -73,6 +76,7 @@ function muestraNotas(data, settings) {
                 <div class="card-body">
                     <h6 class="card-title">${nota.nombre}</h6>
                     <p class="card-text">${descripcionTruncada}</p>
+                    <p class="card-fecha">${fechaFormateada}</p>
 
                     </div>
                     </div>
@@ -107,6 +111,8 @@ export function show(settings, idNota) {
 
             const baseUrl = (settings.url_filesNotas || '').endsWith('/') ? settings.url_filesNotas : settings.url_filesNotas ? settings.url_filesNotas + '/' : '';
 
+             // Formatear la fecha para el detalle
+            const fechaFormateada = formatearFecha(notaJson.fecha);
 
             // Crear HTML para todas las imágenes en fila
             let imagenesHTML = '';
@@ -118,6 +124,9 @@ export function show(settings, idNota) {
                                 <img src="${baseUrl}${item.archivo}" alt="${notaJson.nombre || 'Imagen de nota'}" class="imagen-horizontal">
                             </div>
                         `).join('')}
+                    </div>
+                    <div class="fecha-nota">
+                        ${fechaFormateada}</p>
                     </div>
                 `;
             }
@@ -137,4 +146,29 @@ export function show(settings, idNota) {
         }
     });
 
+}
+
+function formatearFecha(fechaString) {
+    if (!fechaString) return 'Fecha no disponible';
+    
+    // Para fechas en formato ISO como "2025-05-13T00:00:00.000000Z"
+    // Extraemos manualmente año, mes y día para evitar problemas de zona horaria
+    const fecha = new Date(fechaString);
+    
+    // Verificar si la fecha es válida
+    if (isNaN(fecha.getTime())) {
+        return 'Fecha no válida';
+    }
+    
+    const meses = [
+        'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+        'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+    ];
+    
+    // Usar los métodos UTC para obtener la fecha correcta
+    const dia = fecha.getUTCDate();  // Esto devolverá 13, no 12
+    const mes = meses[fecha.getUTCMonth()];
+    const año = fecha.getUTCFullYear();
+    
+    return `${dia} de ${mes} de ${año}`;
 }
